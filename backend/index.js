@@ -1,13 +1,29 @@
+/* eslint-disable import/extensions */
 import express from 'express';
 import path from 'path';
-const app = express();
-const __dirname = path.resolve(path.dirname(''));
-app.use('/static', express.static(path.join(__dirname, 'public')));
+import dotenv from 'dotenv';
+import passport from 'passport';
+import cors from 'cors';
+import connectDB from './config/db.js';
+import ps from './config/passport.js';
 
-// // Define routes
-// import { router as usersRouter } from './routes/api/users/users.js';
-// import { router as loginRouter } from './routes/api/users/login.js';
-// import { router as profileRouter } from './routes/api/users/profile.js';
+// Define routes
+import usersRouter from './routes/api/users/users.js';
+import loginRouter from './routes/api/users/login.js';
+import profileRouter from './routes/api/users/profile.js';
+
+dotenv.config({ path: './config/.env' });
+
+const app = express();
+const dirname = path.resolve(path.dirname(''));
+app.use('/static', express.static(path.join(dirname, 'public')));
+connectDB();
+// passport configure
+app.use(passport.initialize());
+
+// eslint-disable-next-line no-unused-vars
+const passportJwt = ps(passport);
+
 // import { router as createGroupRouter } from './routes/api/groups/new-group.js';
 // import { router as mygroupsRouter } from './routes/api/groups/my-groups.js';
 // import { router as groupsRouter } from './routes/api/groups/groups.js';
@@ -20,10 +36,11 @@ app.get('/', (req, res) => {
 });
 
 // // Init middleware
-// app.use(express.json({ extended: false }));
-// app.use('/api/users', usersRouter);
-// app.use('/api/login', loginRouter);
-// app.use('/api/me', profileRouter);
+app.use(express.json({ extended: false }));
+app.use(cors({}));
+app.use('/api/users', usersRouter);
+app.use('/api/login', loginRouter);
+app.use('/api/me', profileRouter);
 // app.use('/api/new-group', createGroupRouter);
 // app.use('/api/my-groups', mygroupsRouter);
 // app.use('/api/groups', groupsRouter);

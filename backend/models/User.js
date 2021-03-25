@@ -38,7 +38,13 @@ const UserSchema = new mongoose.Schema({
   groups: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Groups',
+      ref: 'group',
+    },
+  ],
+  invites: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'group',
     },
   ],
 });

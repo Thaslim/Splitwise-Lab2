@@ -41,12 +41,10 @@ const CreateGroup = ({
   const history = useHistory();
   useEffect(() => {
     getAllUsers();
-    if (user && user[0].userPicture) {
-      setFilePath(
-        path.join('/static/uploaded_images/users', user[0].userPicture)
-      );
+    if (user && user.userPicture) {
+      setFilePath(path.join('/static/uploaded_images/users', user.userPicture));
     }
-  }, [user, createNewGroup, groupMembers]);
+  }, [user, createNewGroup, getAllUsers]);
 
   const addRow = () => {
     setGroupMembers([...groupMembers, { ...blankMember }]);
@@ -153,8 +151,7 @@ const CreateGroup = ({
                 <p style={{ float: 'left' }}>
                   <img src={filePath} alt='profilePic' />
                   &emsp;
-                  {user && user[0].userName} (
-                  <em>{user && user[0].userEmail}</em>)
+                  {user && user.userName} (<em>{user && user.userEmail}</em>)
                 </p>
               </div>
               <div className='pt-5'>

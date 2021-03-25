@@ -18,7 +18,6 @@ export const getUserProfile = () => async (dispatch) => {
       payload: res.data,
     });
   } catch (error) {
-    console.log(error);
     dispatch({
       type: USER_PROFILE_ERROR,
       payload: {

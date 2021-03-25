@@ -1,5 +1,6 @@
 import axios from 'axios';
 import setAlert from './alert';
+import { loadUser } from './auth';
 import { getAcceptedGroups } from './dashboard';
 
 import {
@@ -57,7 +58,8 @@ export const createNewGroup = (groupData, history) => async (dispatch) => {
       payload: res.data,
     });
     dispatch(setAlert('Group created', 'success'));
-    dispatch(getAcceptedGroups());
+    dispatch(loadUser());
+    // dispatch(getAcceptedGroups());
     setTimeout(() => {
       history.push('/dashboard');
     }, 300);

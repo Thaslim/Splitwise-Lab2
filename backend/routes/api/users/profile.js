@@ -121,6 +121,16 @@ router.post(
         userFields.userName = userName;
       }
       if (userEmail && profile.userEmail !== userEmail) {
+        const emailExists = await User.findOne({ userEmail });
+
+        if (emailExists) {
+          return res.status(400).json({
+            errors: [
+              { msg: `${userEmail} already belongs to another account.` },
+            ],
+          });
+        }
+
         userFields.userEmail = userEmail;
       }
 

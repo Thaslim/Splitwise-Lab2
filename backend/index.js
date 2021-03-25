@@ -11,6 +11,7 @@ import ps from './config/passport.js';
 import usersRouter from './routes/api/users/users.js';
 import loginRouter from './routes/api/users/login.js';
 import profileRouter from './routes/api/users/profile.js';
+import createGroupRouter from './routes/api/groups/new-group.js';
 
 dotenv.config({ path: './config/.env' });
 
@@ -23,8 +24,6 @@ app.use(passport.initialize());
 
 // eslint-disable-next-line no-unused-vars
 const passportJwt = ps(passport);
-
-// import { router as createGroupRouter } from './routes/api/groups/new-group.js';
 // import { router as mygroupsRouter } from './routes/api/groups/my-groups.js';
 // import { router as groupsRouter } from './routes/api/groups/groups.js';
 // import { router as dashboardRouter } from './routes/api/dashboard/dashboard.js';
@@ -41,7 +40,7 @@ app.use(cors({}));
 app.use('/api/users', usersRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/me', profileRouter);
-// app.use('/api/new-group', createGroupRouter);
+app.use('/api/new-group', createGroupRouter);
 // app.use('/api/my-groups', mygroupsRouter);
 // app.use('/api/groups', groupsRouter);
 // app.use('/api/dashboard', dashboardRouter);

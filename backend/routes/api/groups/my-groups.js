@@ -160,10 +160,9 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
     try {
-      const mygroupList = await User.find(
-        { _id: req.user.id },
-        { groups: 1 }
-      ).populate({
+      const mygroupList = await User.findById(req.user.id, {
+        groups: 1,
+      }).populate({
         path: 'groups',
         select: ['groupName', 'groupPicture', 'members'],
         populate: {

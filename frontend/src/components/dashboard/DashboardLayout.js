@@ -7,7 +7,6 @@ import Spinner from '../landingPage/Spinner';
 
 const DashboardLayout = ({
   dashboard: { acceptedGroups, loading },
-  user,
   getAcceptedGroups,
   isAuthenticated,
 }) => {
@@ -16,7 +15,7 @@ const DashboardLayout = ({
   useEffect(() => {
     if (isAuthenticated && !acceptedGroups) getAcceptedGroups();
     if (acceptedGroups) {
-      setAccList(acceptedGroups.mygroupList);
+      setAccList(acceptedGroups.mygroupList.groups);
     }
   }, [getAcceptedGroups, acceptedGroups, loading, isAuthenticated]);
 
@@ -103,10 +102,8 @@ DashboardLayout.propTypes = {
   dashboard: PropTypes.object.isRequired,
   isAuthenticated: PropTypes.bool,
   getAcceptedGroups: PropTypes.func.isRequired,
-  user: PropTypes.array,
 };
 DashboardLayout.defaultProps = {
-  user: null,
   isAuthenticated: false,
 };
 const mapStateToProps = (state) => ({

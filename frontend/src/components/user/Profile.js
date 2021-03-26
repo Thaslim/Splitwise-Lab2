@@ -1,29 +1,19 @@
-/* eslint-disable operator-linebreak */
-/* eslint-disable implicit-arrow-linebreak */
-/* eslint-disable no-shadow */
-/* eslint-disable react/forbid-prop-types */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import path from 'path';
 import { useHistory } from 'react-router-dom';
-import { getUserProfile, updateUserProfile } from '../../actions/profile';
+import { updateUserProfile } from '../../actions/profile';
 import defaultProfilePic from './profile-pic.png';
 import Spinner from '../landingPage/Spinner';
 
-const Profile = ({
-  profile: { profile, loading },
-  getUserProfile,
-  isAuthenticated,
-  updateUserProfile,
-}) => {
+const Profile = ({ user, isAuthenticated, updateUserProfile }) => {
   const [userName, setUserName] = useState();
   const [userPhone, setUserPhone] = useState();
   const [userEmail, setUserEmail] = useState();
   const [userCurrency, setUserCurrency] = useState();
   const [userTimezone, setUserTimezone] = useState();
   const [userLanguage, setUserLanguage] = useState();
-  const [userPicture, setUserPicture] = useState();
   const [showName, setShowName] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
   const [showPhone, setShowPhone] = useState(false);
@@ -33,24 +23,21 @@ const Profile = ({
   const history = useHistory();
 
   useEffect(() => {
-    if (isAuthenticated && !profile) {
-      getUserProfile();
-    }
-    if (!loading && profile) {
-      setUserName(!profile.userName ? '' : profile.userName);
-      setUserPhone(!profile.userPhone ? '' : profile.userPhone);
-      setUserCurrency(!profile.userCurrency ? '' : profile.userCurrency);
-      setUserTimezone(!profile.userTimezone ? '' : profile.userTimezone);
-      setUserLanguage(!profile.userLanguage ? '' : profile.userLanguage);
-      setUserEmail(!profile.userEmail ? '' : profile.userEmail);
-      setUserPicture(!profile.userPicture ? '' : profile.userPicture);
-      if (profile.userPicture) {
+    if (user) {
+      setUserName(!user.userName ? '' : user.userName);
+      setUserPhone(!user.userPhone ? '' : user.userPhone);
+      setUserCurrency(!user.userCurrency ? '' : user.userCurrency);
+      setUserTimezone(!user.userTimezone ? '' : user.userTimezone);
+      setUserLanguage(!user.userLanguage ? '' : user.userLanguage);
+      setUserEmail(!user.userEmail ? '' : user.userEmail);
+
+      if (user.userPicture) {
         setFilePath(
-          path.join('/static/uploaded_images/users', profile.userPicture)
+          path.join('/static/uploaded_images/users', user.userPicture)
         );
       }
     }
-  }, [isAuthenticated, getUserProfile, loading, profile]);
+  }, [isAuthenticated, user]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -65,7 +52,7 @@ const Profile = ({
     updateUserProfile(profileData, history);
   };
 
-  return loading && profile === null ? (
+  return user === null ? (
     <Spinner />
   ) : (
     <div className='container-fluid'>
@@ -80,9 +67,7 @@ const Profile = ({
                   className='picture-frame'
                   src={
                     // eslint-disable-next-line operator-linebreak
-                    profile && profile.userPicture
-                      ? filePath
-                      : defaultProfilePic
+                    user && user.userPicture ? filePath : defaultProfilePic
                   }
                   style={{ width: '200px', height: '200px' }}
                   alt='userPicture'
@@ -101,7 +86,7 @@ const Profile = ({
               <div className='col-lg-6'>
                 <div>
                   <span>Your name </span>
-                  <strong>{profile && profile.userName}</strong>
+                  <strong>{user && user.userName}</strong>
                   {!showName && (
                     <button
                       type='button'
@@ -131,7 +116,7 @@ const Profile = ({
 
                 <div>
                   <span>Your email address</span>
-                  <strong>{profile && profile.userEmail}</strong>
+                  <strong>{user && user.userEmail}</strong>
                   {!showEmail && (
                     <button
                       type='button'
@@ -162,8 +147,7 @@ const Profile = ({
                 <div>
                   <span>Your phone number </span>
                   <strong>
-                    {profile &&
-                      (!profile.userPhone ? 'None' : profile.userPhone)}
+                    {user && (!user.userPhone ? 'None' : user.userPhone)}
                   </strong>
                   {!showPhone && (
                     <button
@@ -623,16 +607,13 @@ const Profile = ({
 };
 
 Profile.propTypes = {
-  getUserProfile: PropTypes.func.isRequired,
   updateUserProfile: PropTypes.func.isRequired,
-  profile: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
   isAuthenticated: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-  profile: state.profile,
+  user: state.auth.user,
   isAuthenticated: state.auth.isAuthenticated,
 });
-export default connect(mapStateToProps, { getUserProfile, updateUserProfile })(
-  Profile
-);
+export default connect(mapStateToProps, { updateUserProfile })(Profile);

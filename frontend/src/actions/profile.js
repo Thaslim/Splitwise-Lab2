@@ -2,31 +2,7 @@ import axios from 'axios';
 import setAlert from './alert';
 import { loadUser } from './auth';
 
-import {
-  GET_USER_PROFILE,
-  USER_PROFILE_ERROR,
-  UPDATE_PROFILE,
-  UPDATE_PROFILE_ERROR,
-} from './types';
-
-// Get current user profile
-export const getUserProfile = () => async (dispatch) => {
-  try {
-    const res = await axios.get('api/me');
-    dispatch({
-      type: GET_USER_PROFILE,
-      payload: res.data,
-    });
-  } catch (error) {
-    dispatch({
-      type: USER_PROFILE_ERROR,
-      payload: {
-        msg: error.response.statusText,
-        status: error.response.status,
-      },
-    });
-  }
-};
+import { UPDATE_PROFILE, UPDATE_PROFILE_ERROR } from './types';
 
 // Update Profile
 export const updateUserProfile = (profileData, history) => async (dispatch) => {
@@ -45,7 +21,6 @@ export const updateUserProfile = (profileData, history) => async (dispatch) => {
       history.push('/dashboard');
     }, 800);
   } catch (error) {
-    console.log(error);
     const { errors } = error.response.data;
 
     if (errors) {

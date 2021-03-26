@@ -10,7 +10,6 @@ import {
   LOGIN_SUCCESS,
   LOGIN_FAIL,
   LOGOUT,
-  CLEAR_PROFILE,
   CLEAR_GROUPS,
   CLEAR_DASHBOARD,
   CLEAR_ALL_MY_GROUPS,
@@ -98,7 +97,6 @@ export const login = ({ userEmail, userPassword, history }) => async (
 
 // Logout
 export const logout = () => (dispatch) => {
-  dispatch({ type: CLEAR_PROFILE });
   dispatch({ type: CLEAR_GROUPS });
   dispatch({ type: CLEAR_DASHBOARD });
   dispatch({ type: CLEAR_ALL_MY_GROUPS });

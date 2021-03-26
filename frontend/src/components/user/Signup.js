@@ -1,5 +1,3 @@
-/* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/jsx-no-duplicate-props */
 import React, { useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';

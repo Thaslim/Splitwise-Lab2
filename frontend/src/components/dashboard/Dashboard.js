@@ -88,6 +88,9 @@ const Dashboard = ({
     isAuthenticated,
     summary,
     summaryLoading,
+    user,
+    loading,
+    acceptedGroups,
   ]);
 
   return loading || summaryLoading || summary === null ? (

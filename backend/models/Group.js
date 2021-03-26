@@ -18,7 +18,12 @@ const GroupSchema = new mongoose.Schema({
       ref: 'user',
     },
   ],
-
+  expenses: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'expense',
+    },
+  ],
   date: {
     type: Date,
     default: Date.now,

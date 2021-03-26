@@ -45,26 +45,6 @@ const upload = multer({
   limits: { fileSize: 1024 * 1024 * 5 },
   fileFilter,
 });
-// @route GET api/me
-// @desc Get current user's profile
-// @access Private
-router.get(
-  '/',
-  passport.authenticate('jwt', { session: false }),
-  async (req, res) => {
-    try {
-      const profile = await User.findById(req.user.id).select([
-        '-userPassword',
-        '-date',
-      ]);
-
-      res.json(profile);
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).send('Server error');
-    }
-  }
-);
 
 // @route POST api/me
 // @desc Update profile information
@@ -160,7 +140,7 @@ router.post(
           {
             $set: userFields,
           },
-          { new: true }
+          { projection: { userPassword: 0, date: 0 } }
         );
 
         return res.json(updateProfile);

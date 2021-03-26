@@ -12,7 +12,7 @@ import usersRouter from './routes/api/users/users.js';
 import loginRouter from './routes/api/users/login.js';
 import profileRouter from './routes/api/users/profile.js';
 import createGroupRouter from './routes/api/groups/new-group.js';
-
+// import mygroupsRouter from './routes/api/groups/my-groups.js';
 dotenv.config({ path: './config/.env' });
 
 const app = express();
@@ -24,7 +24,7 @@ app.use(passport.initialize());
 
 // eslint-disable-next-line no-unused-vars
 const passportJwt = ps(passport);
-// import { router as mygroupsRouter } from './routes/api/groups/my-groups.js';
+
 // import { router as groupsRouter } from './routes/api/groups/groups.js';
 // import { router as dashboardRouter } from './routes/api/dashboard/dashboard.js';
 // import { router as settleRouter } from './routes/api/groups/settleUp.js';

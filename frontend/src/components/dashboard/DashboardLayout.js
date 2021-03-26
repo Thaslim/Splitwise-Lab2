@@ -1,13 +1,8 @@
-/* eslint-disable function-paren-newline */
-/* eslint-disable implicit-arrow-linebreak */
-/* eslint-disable no-shadow */
-/* eslint-disable react/forbid-prop-types */
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { getAcceptedGroups } from '../../actions/dashboard';
-import capitalize from '../../utils/capitalize';
 import Spinner from '../landingPage/Spinner';
 
 const DashboardLayout = ({
@@ -17,13 +12,11 @@ const DashboardLayout = ({
   isAuthenticated,
 }) => {
   const [accList, setAccList] = useState([]);
-  const [accFriends, setAccFriends] = useState([]);
 
   useEffect(() => {
     if (isAuthenticated && !acceptedGroups) getAcceptedGroups();
     if (acceptedGroups) {
       setAccList(acceptedGroups.mygroupList);
-      setAccFriends(acceptedGroups.acceptedMembers);
     }
   }, [getAcceptedGroups, acceptedGroups, loading, isAuthenticated]);
 
@@ -95,52 +88,6 @@ const DashboardLayout = ({
                         </NavLink>
                       </li>
                     ))}
-                  </ul>
-                </>
-              )}
-            </div>
-
-            <div>
-              <div className='header' style={{ textTransform: 'uppercase' }}>
-                Friends &emsp;
-                <NavLink
-                  exact
-                  activeClassName='color-change'
-                  to='/new-group'
-                  className='left_sidebar hlink'
-                >
-                  <i className='fas fa-plus' /> Add
-                </NavLink>
-              </div>
-              {!accFriends.length && (
-                <>
-                  <div className='no-groups'>
-                    You have not added any friends yet.&nbsp;
-                  </div>
-                </>
-              )}
-              {accFriends && user && (
-                <>
-                  <ul>
-                    {accFriends.map((mem) => {
-                      if (user[0].userEmail !== mem.memberEmail) {
-                        return (
-                          <li key={mem.memberEmail}>
-                            <NavLink
-                              exact
-                              activeClassName='color-change'
-                              style={{ fontSize: '0.85rem' }}
-                              className='left_sidebar'
-                              to={`/groups/friends/${mem.idGroupMembers}`}
-                            >
-                              <i className='fas fa-user' /> &nbsp;
-                              {capitalize(mem.memberName)}
-                            </NavLink>
-                          </li>
-                        );
-                      }
-                      return null;
-                    })}
                   </ul>
                 </>
               )}

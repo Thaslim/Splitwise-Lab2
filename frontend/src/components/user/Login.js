@@ -1,4 +1,3 @@
-/* eslint-disable no-shadow */
 import React, { useState } from 'react';
 import { Link, Redirect, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';

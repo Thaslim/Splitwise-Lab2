@@ -12,7 +12,8 @@ import usersRouter from './routes/api/users/users.js';
 import loginRouter from './routes/api/users/login.js';
 import profileRouter from './routes/api/users/profile.js';
 import createGroupRouter from './routes/api/groups/new-group.js';
-// import mygroupsRouter from './routes/api/groups/my-groups.js';
+import mygroupsRouter from './routes/api/groups/my-groups.js';
+
 dotenv.config({ path: './config/.env' });
 
 const app = express();
@@ -41,7 +42,7 @@ app.use('/api/users', usersRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/me', profileRouter);
 app.use('/api/new-group', createGroupRouter);
-// app.use('/api/my-groups', mygroupsRouter);
+app.use('/api/my-groups', mygroupsRouter);
 // app.use('/api/groups', groupsRouter);
 // app.use('/api/dashboard', dashboardRouter);
 // app.use('/api/settle', settleRouter);

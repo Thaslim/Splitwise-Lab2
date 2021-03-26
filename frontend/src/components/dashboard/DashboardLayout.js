@@ -74,13 +74,13 @@ const DashboardLayout = ({
                 <>
                   <ul>
                     {accList.map((group) => (
-                      <li key={group.groupID}>
+                      <li key={group._id}>
                         <NavLink
                           exact
                           activeClassName='color-change'
                           style={{ fontSize: '0.85rem' }}
                           className='left_sidebar'
-                          to={`/groups/${group.groupID}`}
+                          to={`/groups/${group._id}`}
                         >
                           <i className='fas fa-tag' /> &nbsp;
                           {group.groupName}

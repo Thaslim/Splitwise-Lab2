@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 /* eslint-disable operator-linebreak */
 /* eslint-disable consistent-return */
 import express from 'express';
@@ -159,9 +160,19 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
     try {
-      const mygroupList = await User.getAcceptedGroups(req.user.key);
+      const mygroupList = await User.find(
+        { _id: req.user.id },
+        { groups: 1 }
+      ).populate({
+        path: 'groups',
+        select: ['groupName', 'groupPicture', 'members'],
+        populate: {
+          path: 'members',
+          select: ['userName', 'userEmail', 'userPicture'],
+        },
+      });
 
-      if (!mygroupList.length) {
+      if (!mygroupList) {
         return res.status(400).json({
           errors: [
             {
@@ -170,44 +181,9 @@ router.get(
           ],
         });
       }
-      const stringifyGroupList = JSON.stringify(mygroupList);
-      const jsonGroupList = JSON.parse(stringifyGroupList);
-
-      const unresolvedPromises = jsonGroupList.map(
-        async (val) => await splitwisedb.getAcceptedMembers(val.groupID)
-      );
-      const acceptedMembers = await Promise.all(unresolvedPromises);
-      const stringifyAcceptedMembers = JSON.stringify(acceptedMembers);
-      const jsonMemberList = JSON.parse(stringifyAcceptedMembers);
-      const merge = jsonMemberList.flat(1);
-      const uniqueMembers = getUniqueListBy(merge, 'memberEmail');
-
-      const individualGroupMembers = Object.values(
-        merge.reduce(
-          (result, { memberName, memberEmail, userPicture, groupID }) => {
-            // Create new group
-            if (!result[groupID]) {
-              result[groupID] = {
-                groupID,
-                details: [],
-              };
-            }
-            // Append to group
-            result[groupID].details.push({
-              memberName,
-              memberEmail,
-              userPicture,
-            });
-            return result;
-          },
-          {}
-        )
-      );
 
       res.json({
-        mygroupList: jsonGroupList,
-        acceptedMembers: uniqueMembers,
-        individualGroupMembers,
+        mygroupList,
       });
     } catch (error) {
       console.error(error.message);

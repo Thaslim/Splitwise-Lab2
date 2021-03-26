@@ -40,9 +40,12 @@ const CreateGroup = ({
   const [groupMembers, setGroupMembers] = useState([{ ...blankMember }]);
   const history = useHistory();
   useEffect(() => {
-    getAllUsers();
-    if (user && user.userPicture) {
-      setFilePath(path.join('/static/uploaded_images/users', user.userPicture));
+    if (user) {
+      getAllUsers();
+      user.userPicture &&
+        setFilePath(
+          path.join('/static/uploaded_images/users', user.userPicture)
+        );
     }
   }, [user, createNewGroup, getAllUsers]);
 
@@ -207,7 +210,7 @@ CreateGroup.propTypes = {
   createNewGroup: PropTypes.func.isRequired,
   getAllUsers: PropTypes.func.isRequired,
   registeredUsersList: PropTypes.arrayOf(object),
-  user: PropTypes.arrayOf(object),
+  user: PropTypes.object,
 };
 CreateGroup.defaultProps = {
   user: null,

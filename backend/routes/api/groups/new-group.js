@@ -1,3 +1,4 @@
+/* eslint-disable import/extensions */
 /* eslint-disable implicit-arrow-linebreak */
 /* eslint-disable no-return-await */
 /* eslint-disable comma-dangle */
@@ -58,7 +59,7 @@ router.get(
   async (req, res) => {
     try {
       const userList = await User.find(
-        {},
+        { _id: { $ne: req.user.id } },
         { userName: 1, userEmail: 1, userPicture: 1 }
       );
       res.json(userList);

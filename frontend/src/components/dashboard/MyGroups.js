@@ -4,45 +4,50 @@
 /* eslint-disable react/forbid-prop-types */
 
 /* eslint-disable no-shadow */
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { useHistory } from 'react-router-dom';
-import {
-  getAllMyGroups,
-  acceptGroupInvitation,
-  rejectInvitation,
-} from '../../actions/group';
+import SearchBar from 'material-ui-search-bar';
+import { acceptGroupInvitation, leaveGroup } from '../../actions/group';
+import { getAcceptedGroups } from '../../actions/dashboard';
 import profilePic from '../user/profile-pic.png';
 
 const MyGroups = ({
-  getAllMyGroups,
+  getAcceptedGroups,
   user,
-
+  leaveGroup,
   isAuthenticated,
   acceptGroupInvitation,
-  rejectInvitation,
-  group: { allMyGroups },
+  dashboard: { groups },
 }) => {
-  const history = useHistory();
+  const [accList, setAccList] = useState([]);
+  const [invites, setInvites] = useState([]);
+  const [searchGroup, setSearchGroup] = useState('');
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      getAllMyGroups();
+    if (isAuthenticated && user && !groups) {
+      getAcceptedGroups();
     }
-  }, [getAllMyGroups, allMyGroups]);
+
+    if (groups) {
+      setAccList(groups.mygroupList.groups);
+      setInvites(groups.mygroupList.invites);
+    }
+  }, [getAcceptedGroups, groups, isAuthenticated, user]);
 
   return (
-    <div className='allmygroups'>
-      <ul>
-        {allMyGroups &&
-          allMyGroups.map((el) => {
-            if (el.status === 0) {
+    <div className='mygroups'>
+      <div>
+        <h2>Group Invites</h2>
+        {!invites && 'No invitations to show'}
+        <ul>
+          {invites &&
+            invites.map((el) => {
               return (
-                <li key={el.groupID}>
+                <li key={el._id}>
                   <div
                     style={{
-                      padding: '1% 3% 1% 1%',
+                      padding: '2% 3% 1% 1%',
                     }}
                   >
                     <img
@@ -60,30 +65,32 @@ const MyGroups = ({
                     <button
                       type='submit'
                       className='btm btn-outline-danger btn-md rounded'
-                      onClick={() =>
-                        acceptGroupInvitation(`${el.groupID}`, history)
-                      }
+                      onClick={() => acceptGroupInvitation(`${el.groupID}`)}
                     >
                       Accept
                     </button>
                     &emsp;
-                    <button
-                      type='submit'
-                      className='btm btn-outline-secondary btn-md rounded'
-                      onClick={() => rejectInvitation(`${el.groupID}`, history)}
-                    >
-                      Reject
-                    </button>
                   </div>
                 </li>
               );
-            }
+            })}
+        </ul>
+      </div>
+      <div>
+        <h2>Search Your Groups</h2>
+        <SearchBar
+          value={searchGroup}
+          onChange={(newValue) => setSearchGroup(newValue)}
+          // onRequestSearnpm startch={() => showGroup(searchGroup)}
+        />
 
+        {/* {accList &&
+          accList.map((el) => {
             return (
-              <li key={el.groupID}>
+              <li key={el._id}>
                 <div
                   style={{
-                    padding: '1% 3% 1% 1%',
+                    padding: '2% 3% 1% 1%',
                   }}
                 >
                   <img
@@ -100,27 +107,28 @@ const MyGroups = ({
                   &nbsp;
                   <button
                     type='submit'
-                    className='btm btn-outline-dark btn-md rounded'
-                    onClick={() => rejectInvitation(`${el.groupID}`, history)}
+                    className='btm btn-outline-danger btn-md rounded'
+                    onClick={() => leaveGroup(`${el.groupID}`)}
                   >
                     Leave Group
                   </button>
+                  &emsp;
                 </div>
               </li>
             );
-          })}
-      </ul>
+          })} */}
+      </div>
     </div>
   );
 };
 
 MyGroups.propTypes = {
-  user: PropTypes.array,
+  user: PropTypes.object,
   isAuthenticated: PropTypes.bool,
-  getAllMyGroups: PropTypes.func.isRequired,
   acceptGroupInvitation: PropTypes.func.isRequired,
-  rejectInvitation: PropTypes.func.isRequired,
-  group: PropTypes.object.isRequired,
+  leaveGroup: PropTypes.func.isRequired,
+  dashboard: PropTypes.object.isRequired,
+  getAcceptedGroups: PropTypes.func.isRequired,
 };
 
 MyGroups.defaultProps = {
@@ -129,11 +137,11 @@ MyGroups.defaultProps = {
 };
 const mapStateToProps = (state) => ({
   user: state.auth.user,
-  group: state.group,
+  dashboard: state.dashboard,
   isAuthenticated: state.auth.isAuthenticated,
 });
 export default connect(mapStateToProps, {
-  getAllMyGroups,
   acceptGroupInvitation,
-  rejectInvitation,
+  leaveGroup,
+  getAcceptedGroups,
 })(MyGroups);

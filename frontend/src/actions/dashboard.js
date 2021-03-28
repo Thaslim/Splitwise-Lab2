@@ -64,7 +64,7 @@ export const addExpense = ({ groupID, description, amount, date }) => async (
       headers: { 'Content-type': 'application/json' },
     };
     const body = JSON.stringify({ groupID, description, amount, date });
-    const res = await axios.post(`/api/groups/${groupID}`, body, config);
+    const res = await axios.post('api/groups/', body, config);
     dispatch({
       type: ADD_EXPENSE,
       payload: res.data,

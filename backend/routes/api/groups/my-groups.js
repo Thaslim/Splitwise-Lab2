@@ -87,7 +87,8 @@ router.post(
 // @route post api/my-groups/leave-group
 // @desc reject group invitation
 // @access Private
-// router.post('/leave-group', passport.authenticate('jwt', { session: false }), async (req, res) => {
+// router.post('/leave-group',
+// passport.authenticate('jwt', { session: false }), async (req, res) => {
 //   const {groupID, groupName} = req.body;
 
 //   try {

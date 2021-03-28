@@ -36,9 +36,9 @@ const Dashboard = ({
 
   useEffect(() => {
     if (user) {
-      setCSymbol(getSymbolFromCurrency(user[0].userCurrency));
+      setCSymbol(getSymbolFromCurrency(user.userCurrency));
     }
-    if (isAuthenticated && !summary) getDashBoardSummary();
+    // if (isAuthenticated && !summary) getDashBoardSummary();
     if (isAuthenticated && loading) getAcceptedGroups();
     // if (groups && summary) {
     //   const getBacks = summary.summary.map((val) => {
@@ -92,9 +92,7 @@ const Dashboard = ({
     loading,
   ]);
 
-  return loading || summaryLoading || summary === null ? (
-    <Spinner />
-  ) : (
+  return (
     <div className='center-bars'>
       <div className='dashboard'>
         <div className='topbar'>
@@ -125,7 +123,7 @@ const Dashboard = ({
           </div>
         </div>
 
-        <div className='total_balances'>
+        {/* <div className='total_balances'>
           {!groups && (
             <>
               <h3>Welcome to Splitwise!</h3>
@@ -213,8 +211,8 @@ const Dashboard = ({
             </h2>
           </div>
         </div>
-        <div className='container balances'>
-          <div className='row'>
+        <div className='container balances'> */}
+        {/* <div className='row'>
             <div className='col negatives'>
               {!owe && <>You do not owe anything</>}
               <ul>
@@ -261,28 +259,28 @@ const Dashboard = ({
               </ul>
             </div>
           </div>
-        </div>
+        </div> */}
         {billPopUp && (
           <>
             <AddBillPopUp
               billPopUp={billPopUp}
               setBillPopUp={setBillPopUp}
-              mygroups={acceptedGroups && acceptedGroups.mygroupList}
+              mygroups={groups && groups.mygroupList.groups}
               currency={cSymbol}
             />
           </>
         )}
-        {settleUp && (
+        {/* {settleUp && (
           <>
             <SettleUp
               settleUp={settleUp}
               setSettleUp={setSettleUp}
-              mygroups={acceptedGroups && acceptedGroups.mygroupList}
+              mygroups={groups && groups.mygroupList.groups}
               currency={cSymbol}
               oweNames={oweNames}
             />
           </>
-        )}
+        )} */}
       </div>
     </div>
   );

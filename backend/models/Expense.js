@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const SplitSchema = new mongoose.Schema({
-  memeberID: {
+  memberID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
   },

@@ -10,7 +10,7 @@ import Profile from './components/user/Profile';
 import CreateGroup from './components/groups/CreateGroup';
 import PrivateRoute from './components/routing/PrivateRoute';
 import DashboardLayout from './components/dashboard/DashboardLayout';
-// import Dashboard from './components/dashboard/Dashboard';
+import Dashboard from './components/dashboard/Dashboard';
 import Groups from './components/dashboard/Groups';
 // import EditGroup from './components/dashboard/EditGroup';
 // Redux
@@ -44,7 +44,7 @@ const App = () => {
             <PrivateRoute exact path='/my-groups' component={MyGroups} />
             <>
               <DashboardLayout />
-              {/* <PrivateRoute exact path='/dashboard' component={Dashboard} /> */}
+              <PrivateRoute exact path='/dashboard' component={Dashboard} />
               <PrivateRoute exact path='/groups/:id' component={Groups} />
               {/* <PrivateRoute
                 exact

@@ -37,24 +37,22 @@ router.post(
 
     try {
       // See if user exists
-      let user = await User.findOne({ userEmail });
+      let newUser = await User.findOne({ userEmail });
 
-      if (user) {
+      if (newUser) {
         return res.status(400).json({
           errors: [{ msg: `${userEmail} already belongs to another account.` }],
         });
       }
-      user = new User({ userName, userEmail, userPassword });
+      newUser = new User({ userName, userEmail, userPassword });
       // Encrypt password
       const salt = await bcrypt.genSalt(10);
-      user.userPassword = await bcrypt.hash(userPassword, salt);
-      user.save();
+      newUser.userPassword = await bcrypt.hash(userPassword, salt);
+      newUser.save();
 
       const payload = {
         user: {
-          email: userEmail,
-          id: user.id,
-          name: userName,
+          id: newUser.id,
         },
       };
 

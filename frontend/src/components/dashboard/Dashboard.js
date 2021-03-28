@@ -20,7 +20,7 @@ import profilePic from '../user/profile-pic.png';
 import SettleUp from '../expenses/SettleUp';
 
 const Dashboard = ({
-  dashboard: { acceptedGroups, loading, summary, summaryLoading },
+  dashboard: { groups, loading, summary, summaryLoading },
   user,
   getDashBoardSummary,
   getAcceptedGroups,
@@ -40,48 +40,48 @@ const Dashboard = ({
     }
     if (isAuthenticated && !summary) getDashBoardSummary();
     if (isAuthenticated && loading) getAcceptedGroups();
-    if (acceptedGroups && summary) {
-      const getBacks = summary.summary.map((val) => {
-        if (Object.values(val)[0] > 0) {
-          const memName = findInArray(
-            acceptedGroups.acceptedMembers,
-            Object.keys(val)[0]
-          );
-          setgetBackNames((getBackNames) => [
-            ...getBackNames,
-            {
-              name: memName.memberName,
-              bal: Object.values(val)[0],
-              pic: memName.userPicture,
-              email: memName.memberEmail,
-            },
-          ]);
-          return Object.values(val)[0];
-        }
-        return 0;
-      });
-      const owes = summary.summary.map((val) => {
-        if (Object.values(val)[0] < 0) {
-          const memName = findInArray(
-            acceptedGroups.acceptedMembers,
-            Object.keys(val)[0]
-          );
-          setOweNames((oweNames) => [
-            ...oweNames,
-            {
-              name: memName.memberName,
-              bal: Object.values(val)[0],
-              pic: memName.userPicture,
-              email: memName.memberEmail,
-            },
-          ]);
-          return Object.values(val)[0];
-        }
-        return 0;
-      });
-      setGetBack(roundToTwo(reducedSum(getBacks)));
-      setOwe(roundToTwo(reducedSum(owes)));
-    }
+    // if (groups && summary) {
+    //   const getBacks = summary.summary.map((val) => {
+    //     if (Object.values(val)[0] > 0) {
+    //       const memName = findInArray(
+    //         acceptedGroups.acceptedMembers,
+    //         Object.keys(val)[0]
+    //       );
+    //       setgetBackNames((getBackNames) => [
+    //         ...getBackNames,
+    //         {
+    //           name: memName.memberName,
+    //           bal: Object.values(val)[0],
+    //           pic: memName.userPicture,
+    //           email: memName.memberEmail,
+    //         },
+    //       ]);
+    //       return Object.values(val)[0];
+    //     }
+    //     return 0;
+    //   });
+    //   const owes = summary.summary.map((val) => {
+    //     if (Object.values(val)[0] < 0) {
+    //       const memName = findInArray(
+    //         acceptedGroups.acceptedMembers,
+    //         Object.keys(val)[0]
+    //       );
+    //       setOweNames((oweNames) => [
+    //         ...oweNames,
+    //         {
+    //           name: memName.memberName,
+    //           bal: Object.values(val)[0],
+    //           pic: memName.userPicture,
+    //           email: memName.memberEmail,
+    //         },
+    //       ]);
+    //       return Object.values(val)[0];
+    //     }
+    //     return 0;
+    //   });
+    //   setGetBack(roundToTwo(reducedSum(getBacks)));
+    //   setOwe(roundToTwo(reducedSum(owes)));
+    // }
   }, [
     getDashBoardSummary,
     getAcceptedGroups,
@@ -90,7 +90,6 @@ const Dashboard = ({
     summaryLoading,
     user,
     loading,
-    acceptedGroups,
   ]);
 
   return loading || summaryLoading || summary === null ? (
@@ -127,7 +126,7 @@ const Dashboard = ({
         </div>
 
         <div className='total_balances'>
-          {!acceptedGroups && (
+          {!groups && (
             <>
               <h3>Welcome to Splitwise!</h3>
               <h5>

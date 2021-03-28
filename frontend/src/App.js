@@ -11,14 +11,14 @@ import CreateGroup from './components/groups/CreateGroup';
 import PrivateRoute from './components/routing/PrivateRoute';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 // import Dashboard from './components/dashboard/Dashboard';
-// import Groups from './components/dashboard/Groups';
+import Groups from './components/dashboard/Groups';
 // import EditGroup from './components/dashboard/EditGroup';
 // Redux
 import store from './store';
 import Alert from './components/landingPage/Alert';
 import { loadUser } from './actions/auth';
 import setToken from './utils/setToken';
-// import MyGroups from './components/dashboard/MyGroups';
+import MyGroups from './components/dashboard/MyGroups';
 // import RecentActivity from './components/dashboard/RecentActivity';
 
 const App = () => {
@@ -41,12 +41,12 @@ const App = () => {
             <Route exact path='/signup' component={Signup} />
             <PrivateRoute exact path='/me' component={Profile} />
             <PrivateRoute exact path='/new-group' component={CreateGroup} />
-            {/* <PrivateRoute exact path='/my-groups' component={MyGroups} /> */}
+            <PrivateRoute exact path='/my-groups' component={MyGroups} />
             <>
               <DashboardLayout />
-              {/* <PrivateRoute exact path='/dashboard' component={Dashboard} />
+              {/* <PrivateRoute exact path='/dashboard' component={Dashboard} /> */}
               <PrivateRoute exact path='/groups/:id' component={Groups} />
-              <PrivateRoute
+              {/* <PrivateRoute
                 exact
                 path='/my-groups/get-group/:id'
                 component={EditGroup}

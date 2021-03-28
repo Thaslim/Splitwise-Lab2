@@ -16,7 +16,7 @@ import {
 // Get users active groups list
 export const getAcceptedGroups = () => async (dispatch) => {
   try {
-    const res = await axios.get('api/my-groups/acc-groups');
+    const res = await axios.get('api/my-groups/');
     dispatch({
       type: GET_GROUPS,
       payload: res.data,

@@ -10,7 +10,6 @@ import User from '../../../models/User.js';
 import Group from '../../../models/Group.js';
 
 const dirname = path.resolve(path.dirname(''));
-
 const { check, validationResult } = validator;
 
 const destPath = `${dirname}/public/uploaded_images/groups`;
@@ -46,29 +45,6 @@ const upload = multer({
   fileFilter,
 });
 
-// @route GET api/my-groups
-// @desc Get current user's groups
-// @access Private
-// router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
-//   try {
-//     const mygroupList = await splitwisedb.getGroupsList(req.user.key);
-
-//     if (!mygroupList.length) {
-//       return res.status(400).json({
-//         errors: [
-//           {
-//             msg: 'Create a group to get started!',
-//           },
-//         ],
-//       });
-//     }
-//     res.json(mygroupList);
-//   } catch (error) {
-//     console.error(error.message);
-//     res.status(500).send('Server error');
-//   }
-// });
-
 const getUniqueListBy = (arr, key) => [
   ...new Map(arr.map((item) => [item[key], item])).values(),
 ];
@@ -76,37 +52,43 @@ const getUniqueListBy = (arr, key) => [
 // @route post api/my-groups/accept-invitation
 // @desc accept group invitation
 // @access Private
-// router.post('/accept-invitation', auth, async (req, res) => {
-//   const { groupID } = req.body;
-//   const groupName = await splitwisedb.getGroupName(groupID);
-//   try {
-//     const acceptInvitation = await splitwisedb.acceptInvitation(
-//       groupID,
-//       req.user.key,
-//     );
-//     const userName = await splitwisedb.getUserName(req.user.id);
+router.post(
+  '/accept-invitation',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    const { groupID, groupName } = req.body;
 
-//     const activity = await splitwisedb.addActivity(
-//       'accepted invitation',
-//       groupID,
-//       groupName[0].groupName,
-//       userName[0].userName,
-//       req.user.key,
-//       userName[0].userName,
-//       req.user.key,
-//     );
-//     return res.json('Updated');
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send('Server error');
-//   }
-// });
+    try {
+      await Group.findByIdAndUpdate(groupID, {
+        $addToSet: { members: req.user.id },
+        $push: {
+          activity: {
+            actionBy: req.user.id,
+            action: `Accepted invitation to join ${groupName} group`,
+          },
+        },
+      });
 
-// @route post api/my-groups/reject-invitation
+      await User.findByIdAndUpdate(req.user.id, {
+        $addToSet: { groups: groupID },
+        $pull: {
+          invites: groupID,
+        },
+      });
+
+      res.json('Invitation Accepted');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    }
+  }
+);
+
+// @route post api/my-groups/leave-group
 // @desc reject group invitation
 // @access Private
-// router.post('/reject-invitation', auth, async (req, res) => {
-//   const { groupID } = req.body;
+// router.post('/leave-group', passport.authenticate('jwt', { session: false }), async (req, res) => {
+//   const {groupID, groupName} = req.body;
 
 //   try {
 //     const checkBalance = await splitwisedb.getGroupBalances(groupID);
@@ -114,13 +96,13 @@ const getUniqueListBy = (arr, key) => [
 //     const jsonBal = JSON.parse(stringifyBal);
 //     if (jsonBal && jsonBal.length > 0) {
 //       const found = jsonBal.find(
-//         (element) => element.memberEmail === req.user.key,
+//         (element) => element.memberEmail === req.user.key
 //       );
 //       if (found && Math.abs(found.total) > 0.5) {
 //         return res.status(400).json({
 //           errors: [
 //             {
-//               msg: 'Settle up all the balances before leaving the group',
+//               msg: `Settle up all the balances before leaving the group`,
 //             },
 //           ],
 //         });
@@ -134,7 +116,7 @@ const getUniqueListBy = (arr, key) => [
 //         return res.status(400).json({
 //           errors: [
 //             {
-//               msg: 'Delete the group if balances with other group members are not settled up',
+//               msg: `Delete the group if balances with other group members are not settled up`,
 //             },
 //           ],
 //         });
@@ -142,7 +124,7 @@ const getUniqueListBy = (arr, key) => [
 //     }
 //     const rejectInvitation = await splitwisedb.rejectInvitation(
 //       groupID,
-//       req.user.key,
+//       req.user.key
 //     );
 
 //     return res.json('Rejected Invitation');
@@ -152,24 +134,28 @@ const getUniqueListBy = (arr, key) => [
 //   }
 // });
 
-// @route GET api/my-groups/acc-groups
+// @route GET api/my-groups/
 // @desc Get current user's groups
 // @access Private
 router.get(
-  '/acc-groups',
+  '/',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
     try {
       const mygroupList = await User.findById(req.user.id, {
         groups: 1,
-      }).populate({
-        path: 'groups',
-        select: ['groupName', 'groupPicture', 'members'],
-        populate: {
-          path: 'members',
-          select: ['userName', 'userEmail', 'userPicture'],
-        },
-      });
+        invites: 1,
+        _id: 0,
+      })
+        .populate({
+          path: 'groups',
+          select: ['groupName', 'groupPicture', 'members'],
+          populate: {
+            path: 'members',
+            select: ['userName', 'userEmail', 'userPicture'],
+          },
+        })
+        .populate({ path: 'invites', select: ['groupName', 'groupPicture'] });
 
       if (!mygroupList) {
         return res.status(400).json({

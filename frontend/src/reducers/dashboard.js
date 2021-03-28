@@ -13,7 +13,7 @@ import {
 } from '../actions/types';
 
 const initialState = {
-  acceptedGroups: null,
+  groups: null,
   summary: null,
   error: {},
   loading: true,
@@ -28,7 +28,7 @@ function dashboardReducer(state = initialState, action) {
     case GET_GROUPS:
       return {
         ...state,
-        acceptedGroups: payload,
+        groups: payload,
         loading: false,
       };
 
@@ -41,7 +41,7 @@ function dashboardReducer(state = initialState, action) {
     case CLEAR_GROUPS:
       return {
         ...state,
-        acceptedGroups: null,
+        groups: null,
         loading: false,
       };
     case ADD_EXPENSE:

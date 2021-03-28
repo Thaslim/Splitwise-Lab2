@@ -9,13 +9,10 @@ import {
   EDIT_GROUP_INFO,
   EDIT_GROUP_INFO_ERROR,
   CLEAR_GROUP_ACTIVITY,
-  GET_ALL_MY_GROUPS,
-  GET_ALL_MY_GROUPS_ERROR,
-  CLEAR_ALL_MY_GROUPS,
   ACCEPT_INVITATION_ERROR,
   ACCEPT_INVITATION,
-  REJECT_INVITATION,
-  REJECT_INVITATION_ERROR,
+  LEAVE_GROUP,
+  LEAVE_GROUP_ERROR,
   GET_RECENT_ACTIVITY,
   GET_RECENT_ACTIVITY_ERROR,
   CLEAR_RECENT_ACTIVITY,
@@ -27,7 +24,6 @@ const initialState = {
   error: {},
   groupActivity: null,
   groupInfo: null,
-  allMyGroups: null,
   invitation: '',
   recentactivity: null,
 };
@@ -45,10 +41,9 @@ function groupReducer(state = initialState, action) {
     case GET_ALL_USERS_ERROR:
     case GET_GROUP_ACTIVITY_ERROR:
     case EDIT_GROUP_INFO_ERROR:
-    case GET_ALL_MY_GROUPS_ERROR:
     case ACCEPT_INVITATION_ERROR:
-    case REJECT_INVITATION_ERROR:
     case GET_RECENT_ACTIVITY_ERROR:
+    case LEAVE_GROUP_ERROR:
       return {
         ...state,
         error: payload,
@@ -73,25 +68,16 @@ function groupReducer(state = initialState, action) {
         ...state,
         groupActivity: null,
       };
-    case GET_ALL_MY_GROUPS:
-      return {
-        ...state,
-        allMyGroups: payload,
-      };
-    case CLEAR_ALL_MY_GROUPS:
-      return {
-        ...state,
-        allMyGroups: null,
-      };
+
     case ACCEPT_INVITATION:
       return {
         ...state,
-        invitation: 'accepted',
+        invitation: payload,
       };
-    case REJECT_INVITATION:
+    case LEAVE_GROUP:
       return {
         ...state,
-        invitation: 'Rejected',
+        invitation: payload,
       };
 
     case GET_RECENT_ACTIVITY:

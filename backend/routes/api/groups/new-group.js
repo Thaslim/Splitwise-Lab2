@@ -95,7 +95,7 @@ router.post(
     try {
       let group = await Group.findOne({
         groupName,
-        modifiedBy: req.user.id,
+        createdBy: req.user.id,
       });
       if (group) {
         return res.status(400).json({
@@ -107,11 +107,15 @@ router.post(
         });
       }
 
-      group = new Group({ groupName, modifiedBy: req.user.id });
+      group = new Group({ groupName, createdBy: req.user.id });
       const groupId = group.id;
 
       if (req.file) group.groupPicture = groupPicture;
       group.members.push(req.user.id);
+      group.activity.push({
+        actionBy: req.user.id,
+        action: `created ${groupName} group`,
+      });
       group.save();
       let ids = [];
       if (invites) {

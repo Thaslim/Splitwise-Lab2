@@ -1,7 +1,6 @@
 import axios from 'axios';
 import setAlert from './alert';
 import { loadUser } from './auth';
-import { getAcceptedGroups } from './dashboard';
 
 import {
   CREATE_GROUP,
@@ -13,14 +12,12 @@ import {
   EDIT_GROUP_INFO,
   EDIT_GROUP_INFO_ERROR,
   CLEAR_GROUP_ACTIVITY,
-  GET_ALL_MY_GROUPS,
-  GET_ALL_MY_GROUPS_ERROR,
   ACCEPT_INVITATION,
   ACCEPT_INVITATION_ERROR,
-  REJECT_INVITATION,
-  REJECT_INVITATION_ERROR,
   GET_RECENT_ACTIVITY,
   GET_RECENT_ACTIVITY_ERROR,
+  LEAVE_GROUP,
+  LEAVE_GROUP_ERROR,
 } from './types';
 
 // Get registered user list
@@ -59,7 +56,6 @@ export const createNewGroup = (groupData, history) => async (dispatch) => {
     });
     dispatch(setAlert('Group created', 'success'));
     dispatch(loadUser());
-    // dispatch(getAcceptedGroups());
     setTimeout(() => {
       history.push('/dashboard');
     }, 300);
@@ -134,32 +130,15 @@ export const editGroupInfo = (groupID, groupData, history) => async (
   }
 };
 
-// Get all my groups including not accepted
-export const getAllMyGroups = () => async (dispatch) => {
-  try {
-    const res = await axios.get('api/my-groups');
-    dispatch({
-      type: GET_ALL_MY_GROUPS,
-      payload: res.data,
-    });
-  } catch (error) {
-    dispatch({
-      type: GET_ALL_MY_GROUPS_ERROR,
-      payload: {
-        msg: error.response.statusText,
-        status: error.response.status,
-      },
-    });
-  }
-};
-
 // Accept group Invitation
-export const acceptGroupInvitation = (groupID, history) => async (dispatch) => {
+export const acceptGroupInvitation = (groupID, groupName) => async (
+  dispatch
+) => {
   try {
     const config = {
       headers: { 'content-type': 'application/json' },
     };
-    const body = { groupID };
+    const body = { groupID, groupName };
     const res = await axios.post(
       'api/my-groups/accept-invitation',
       body,
@@ -170,11 +149,8 @@ export const acceptGroupInvitation = (groupID, history) => async (dispatch) => {
       payload: res.data,
     });
     dispatch(setAlert('Invitation Accepted', 'success'));
-    dispatch(getAcceptedGroups());
-    dispatch(getGroupActivity(`${groupID}`));
-    setTimeout(() => {
-      history.push(`/api/groups/${groupID}`);
-    }, 500);
+    dispatch(loadUser());
+    // dispatch(getGroupActivity(`${groupID}`));
   } catch (error) {
     const { errors } = error.response.data;
     if (errors) {
@@ -190,33 +166,24 @@ export const acceptGroupInvitation = (groupID, history) => async (dispatch) => {
   }
 };
 
-// Reject group Invitation
-export const rejectInvitation = (groupID, history) => async (dispatch) => {
+export const leaveGroup = (groupID, groupName) => async (dispatch) => {
   try {
     const config = {
       headers: { 'content-type': 'application/json' },
     };
-    const body = { groupID };
-    const res = await axios.post(
-      'api/my-groups/reject-invitation',
-      body,
-      config
-    );
+    const body = { groupID, groupName };
+    const res = await axios.post('api/my-groups/leave-group', body, config);
     dispatch({
-      type: REJECT_INVITATION,
+      type: LEAVE_GROUP,
       payload: res.data,
     });
-
-    setTimeout(() => {
-      history.goBack();
-    }, 500);
   } catch (error) {
     const { errors } = error.response.data;
     if (errors) {
       errors.forEach((err) => dispatch(setAlert(err.msg, 'danger')));
     }
     dispatch({
-      type: REJECT_INVITATION_ERROR,
+      type: LEAVE_GROUP_ERROR,
       payload: {
         msg: error.response.statusText,
         status: error.response.status,

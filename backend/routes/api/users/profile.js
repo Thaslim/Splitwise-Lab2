@@ -135,15 +135,11 @@ router.post(
       }
 
       if (profile) {
-        const updateProfile = await User.findByIdAndUpdate(
-          req.user.id,
-          {
-            $set: userFields,
-          },
-          { projection: { userPassword: 0, date: 0 } }
-        );
+        await User.findByIdAndUpdate(req.user.id, {
+          $set: userFields,
+        });
 
-        return res.json(updateProfile);
+        res.json('Profile updated');
       }
     } catch (error) {
       console.log(error);

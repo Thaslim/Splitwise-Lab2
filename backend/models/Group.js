@@ -1,12 +1,19 @@
 import mongoose from 'mongoose';
-import mongooseLogs from 'mongoose-activitylogs';
 
+const ActivitySchema = new mongoose.Schema({
+  actionBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'user',
+  },
+  action: { type: String, required: true },
+});
 const GroupSchema = new mongoose.Schema({
   groupName: {
     type: String,
     required: true,
   },
-  modifiedBy: {
+  createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'user',
@@ -24,17 +31,11 @@ const GroupSchema = new mongoose.Schema({
       ref: 'expense',
     },
   ],
+  activity: [ActivitySchema],
   date: {
     type: Date,
     default: Date.now,
   },
-});
-
-GroupSchema.plugin(mongooseLogs, {
-  schemaName: 'Group',
-  createAction: 'created',
-  updateAction: 'joined',
-  deleteAction: 'left from',
 });
 
 export default mongoose.model('group', GroupSchema);

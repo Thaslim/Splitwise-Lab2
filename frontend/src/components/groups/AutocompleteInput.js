@@ -3,9 +3,16 @@
 /* eslint-disable no-use-before-define */
 import React from 'react';
 import { TextField, makeStyles } from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import PropTypes from 'prop-types';
 import profilePic from '../user/profile-pic.png';
+
+const OPTIONS_LIMIT = 5;
+const defaultFilterOptions = createFilterOptions();
+
+const filterOptions = (options, state) => {
+  return defaultFilterOptions(options, state).slice(0, OPTIONS_LIMIT);
+};
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,6 +49,7 @@ const AutocompleteInput = ({
         </div>
         <div className='col-sm' style={{ marginLeft: '-15%' }}>
           <Autocomplete
+            filterOptions={filterOptions}
             freeSolo
             id={memName}
             disableClearable

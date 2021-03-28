@@ -12,7 +12,6 @@ import {
   LOGOUT,
   CLEAR_GROUPS,
   CLEAR_DASHBOARD,
-  CLEAR_ALL_MY_GROUPS,
 } from './types';
 
 // Load User
@@ -99,6 +98,5 @@ export const login = ({ userEmail, userPassword, history }) => async (
 export const logout = () => (dispatch) => {
   dispatch({ type: CLEAR_GROUPS });
   dispatch({ type: CLEAR_DASHBOARD });
-  dispatch({ type: CLEAR_ALL_MY_GROUPS });
   dispatch({ type: LOGOUT });
 };

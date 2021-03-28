@@ -11,6 +11,11 @@ export const findbyID = (arrObj, id) => {
   return found;
 };
 
+export const findbyName = (arrObj, name) => {
+  const found = arrObj.filter((ele) => ele.groupName === name);
+  return found;
+};
+
 export const sortArray = (arrObj) => {
   const sortedArrObj = arrObj.sort(
     (a, b) => new Date(b.date) - new Date(a.date)

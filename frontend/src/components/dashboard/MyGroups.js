@@ -7,9 +7,11 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { NavLink } from 'react-router-dom';
 import SearchBar from 'material-ui-search-bar';
 import { acceptGroupInvitation, leaveGroup } from '../../actions/group';
 import { getAcceptedGroups } from '../../actions/dashboard';
+import { findbyName } from '../../utils/findUtil';
 import profilePic from '../user/profile-pic.png';
 
 const MyGroups = ({
@@ -23,6 +25,7 @@ const MyGroups = ({
   const [accList, setAccList] = useState([]);
   const [invites, setInvites] = useState([]);
   const [searchGroup, setSearchGroup] = useState('');
+  const [showGroupInfo, setShowGroupInfo] = useState([]);
 
   useEffect(() => {
     if (isAuthenticated && user && !groups) {
@@ -34,6 +37,11 @@ const MyGroups = ({
       setInvites(groups.mygroupList.invites);
     }
   }, [getAcceptedGroups, groups, isAuthenticated, user]);
+
+  const showGroup = (value) => {
+    const found = findbyName(accList, value);
+    if (found) setShowGroupInfo(found);
+  };
 
   return (
     <div className='mygroups'>
@@ -65,7 +73,12 @@ const MyGroups = ({
                     <button
                       type='submit'
                       className='btm btn-outline-danger btn-md rounded'
-                      onClick={() => acceptGroupInvitation(`${el.groupID}`)}
+                      onClick={() =>
+                        acceptGroupInvitation(
+                          `${el.groupID}`,
+                          `${el.groupName}`
+                        )
+                      }
                     >
                       Accept
                     </button>
@@ -76,47 +89,57 @@ const MyGroups = ({
             })}
         </ul>
       </div>
-      <div>
+      <div style={{ marginTop: '3%' }}>
         <h2>Search Your Groups</h2>
+
         <SearchBar
           value={searchGroup}
           onChange={(newValue) => setSearchGroup(newValue)}
-          // onRequestSearnpm startch={() => showGroup(searchGroup)}
+          onRequestSearch={() => showGroup(searchGroup)}
         />
-
-        {/* {accList &&
-          accList.map((el) => {
-            return (
-              <li key={el._id}>
-                <div
-                  style={{
-                    padding: '2% 3% 1% 1%',
-                  }}
-                >
-                  <img
-                    className='userImage'
-                    src={
-                      (el.groupPicture &&
-                        `/static/uploaded_images/groups/${el.groupPicture}`) ||
-                      profilePic
-                    }
-                    alt='groupPic'
-                  />
-                  &nbsp;
-                  {el.groupName}
-                  &nbsp;
-                  <button
-                    type='submit'
-                    className='btm btn-outline-danger btn-md rounded'
-                    onClick={() => leaveGroup(`${el.groupID}`)}
+        <br />
+        <ul>
+          {showGroupInfo &&
+            showGroupInfo.map((el) => {
+              return (
+                <li key={el._id}>
+                  <div
+                    style={{
+                      padding: '2% 3% 1% 1%',
+                    }}
                   >
-                    Leave Group
-                  </button>
-                  &emsp;
-                </div>
-              </li>
-            );
-          })} */}
+                    <NavLink
+                      style={{ textDecoration: 'none', color: '#1cc29f' }}
+                      to={`/groups/${el._id}`}
+                    >
+                      <img
+                        className='userImage'
+                        src={
+                          (el.groupPicture &&
+                            `/static/uploaded_images/groups/${el.groupPicture}`) ||
+                          profilePic
+                        }
+                        alt='groupPic'
+                      />
+                      &nbsp;
+                      {el.groupName}
+                    </NavLink>
+                    &nbsp;
+                    <button
+                      type='submit'
+                      className='btm btn-outline-danger btn-md rounded'
+                      onClick={() =>
+                        leaveGroup(`${el.groupID}`, `${el.groupName}`)
+                      }
+                    >
+                      Leave Group
+                    </button>
+                    &emsp;
+                  </div>
+                </li>
+              );
+            })}
+        </ul>
       </div>
     </div>
   );

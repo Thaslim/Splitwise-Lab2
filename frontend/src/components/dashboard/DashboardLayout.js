@@ -6,18 +6,18 @@ import { getAcceptedGroups } from '../../actions/dashboard';
 import Spinner from '../landingPage/Spinner';
 
 const DashboardLayout = ({
-  dashboard: { acceptedGroups, loading },
+  dashboard: { groups, loading },
   getAcceptedGroups,
   isAuthenticated,
 }) => {
   const [accList, setAccList] = useState([]);
 
   useEffect(() => {
-    if (isAuthenticated && !acceptedGroups) getAcceptedGroups();
-    if (acceptedGroups) {
-      setAccList(acceptedGroups.mygroupList.groups);
+    if (isAuthenticated && !groups) getAcceptedGroups();
+    if (groups) {
+      setAccList(groups.mygroupList.groups);
     }
-  }, [getAcceptedGroups, acceptedGroups, loading, isAuthenticated]);
+  }, [getAcceptedGroups, groups, loading, isAuthenticated]);
 
   return loading ? (
     <Spinner />

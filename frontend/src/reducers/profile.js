@@ -1,6 +1,6 @@
 import { UPDATE_PROFILE, UPDATE_PROFILE_ERROR } from '../actions/types';
 
-const initialState = { error: {} };
+const initialState = { updateStatus: '', error: {} };
 
 function profileReducer(state = initialState, action) {
   const { type, payload } = action;
@@ -8,6 +8,7 @@ function profileReducer(state = initialState, action) {
     case UPDATE_PROFILE:
       return {
         ...state,
+        updateStatus: payload,
       };
 
     case UPDATE_PROFILE_ERROR:

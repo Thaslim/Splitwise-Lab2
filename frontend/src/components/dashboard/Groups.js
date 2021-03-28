@@ -21,7 +21,7 @@ import GroupBalanceList from './GroupBalanceList';
 
 const Groups = ({
   group: { groupActivity },
-  dashboard: { acceptedGroups, summary },
+  dashboard: { acceptedGroups },
   match,
   user,
   getGroupActivity,
@@ -43,8 +43,11 @@ const Groups = ({
       getGroupActivity(match.params.id);
     }
 
-    if (acceptedGroups && acceptedGroups.mygroupList.length > 0) {
-      const groupInfo = findbyID(acceptedGroups.mygroupList, match.params.id);
+    if (acceptedGroups && acceptedGroups.mygroupList.groups.length > 0) {
+      const groupInfo = findbyID(
+        acceptedGroups.mygroupList.groups,
+        match.params.id
+      );
       setGroupImg(
         groupInfo[0].groupPicture
           ? `/static/uploaded_images/groups/${groupInfo[0].groupPicture}`
@@ -53,29 +56,29 @@ const Groups = ({
       setGroupName(groupInfo[0].groupName);
     }
 
-    if (summary) {
-      // eslint-disable-next-line no-unused-vars
-      const owes = summary.summary.map((val) => {
-        if (Object.values(val)[0] < 0) {
-          const memName = findInArray(
-            acceptedGroups.acceptedMembers,
-            Object.keys(val)[0]
-          );
-          setOweNames((oweNames) => [
-            ...oweNames,
-            {
-              name: memName.memberName,
-              bal: Object.values(val)[0],
-              pic: memName.userPicture,
-              email: memName.memberEmail,
-            },
-          ]);
-          return Object.values(val)[0];
-        }
-        return 0;
-      });
-    }
-  }, [getGroupActivity, match, acceptedGroups]);
+    // if (summary) {
+    //   // eslint-disable-next-line no-unused-vars
+    //   const owes = summary.summary.map((val) => {
+    //     if (Object.values(val)[0] < 0) {
+    //       const memName = findInArray(
+    //         acceptedGroups.acceptedMembers,
+    //         Object.keys(val)[0]
+    //       );
+    //       setOweNames((oweNames) => [
+    //         ...oweNames,
+    //         {
+    //           name: memName.memberName,
+    //           bal: Object.values(val)[0],
+    //           pic: memName.userPicture,
+    //           email: memName.memberEmail,
+    //         },
+    //       ]);
+    //       return Object.values(val)[0];
+    //     }
+    //     return 0;
+    //   });
+    // }
+  }, [getGroupActivity, match, acceptedGroups, isAuthenticated, user, history]);
   return groupActivity === null ? (
     <Spinner />
   ) : (

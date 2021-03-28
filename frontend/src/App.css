@@ -372,13 +372,11 @@ select {
   clear: none;
 }
 
-.allmygroups {
+.mygroups {
   width: 60%;
-
-  padding-right: 20;
-
-  background-color: rgb(194, 219, 218);
-
+  /* padding-right: 20; */
+  margin-top: 3.5%;
+  /* background-color: rgb(194, 219, 218); */
   margin-left: auto;
   margin-right: auto;
 }

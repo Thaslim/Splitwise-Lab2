@@ -6,7 +6,8 @@
 /* eslint-disable operator-linebreak */
 /* eslint-disable consistent-return */
 import express from 'express';
-import path from 'path';
+import AWS from 'aws-sdk';
+import uuid from 'uuid';
 import validator from 'express-validator';
 import passport from 'passport';
 import multer from 'multer';
@@ -18,12 +19,15 @@ const { check, validationResult } = validator;
 const router = express.Router();
 export default router;
 
-const dirname = path.resolve(path.dirname(''));
-const destPath = `${dirname}/public/uploaded_images/groups`;
-const storage = multer.diskStorage({
-  destination: destPath,
-  filename: (req, file, cb) => {
-    cb(null, `group_${file.originalname}`);
+const S3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_KEY,
+  region: process.env.AWS_BUCKET_REGION,
+});
+
+const storage = multer.memoryStorage({
+  destination(_req, _file, callback) {
+    callback(null, '');
   },
 });
 
@@ -85,7 +89,23 @@ router.post(
     let groupPicture;
     const { groupName, groupMembers: invites } = req.body;
     if (req.file) {
-      groupPicture = req.file.filename;
+      const myFile = req.file.originalname.split('.');
+      const fileType = myFile[myFile.length - 1];
+
+      const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `${uuid()}.${fileType}`,
+        Body: req.file.buffer,
+      };
+
+      S3.upload(params, (error) => {
+        if (error) {
+          return res
+            .status(400)
+            .json({ errors: [{ msg: 'Error uploading file' }] });
+        }
+      });
+      groupPicture = params.Key;
     }
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -111,7 +131,7 @@ router.post(
       const groupId = group.id;
 
       if (req.file) group.groupPicture = groupPicture;
-      group.members.push(req.user.id);
+      group.members.push({ memberID: req.user.id });
       group.activity.push({
         actionBy: req.user.id,
         action: `created ${groupName} group`,

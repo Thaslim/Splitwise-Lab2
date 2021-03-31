@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { getAcceptedGroups } from '../../actions/dashboard';
+
 import Spinner from '../landingPage/Spinner';
 
 const DashboardLayout = ({
   dashboard: { groups, loading },
-  getAcceptedGroups,
+
+  user,
   isAuthenticated,
 }) => {
   const [accList, setAccList] = useState([]);
 
   useEffect(() => {
-    if (isAuthenticated && !groups) getAcceptedGroups();
+    if (isAuthenticated && loading) return <Redirect to='/dashboard' />;
     if (groups) {
       setAccList(groups.mygroupList.groups);
     }
-  }, [getAcceptedGroups, groups, loading, isAuthenticated]);
+  }, [groups, user, loading, isAuthenticated]);
 
-  return loading ? (
+  return loading && groups === null ? (
     <Spinner />
   ) : (
     <div className='side_bar'>
@@ -100,15 +101,16 @@ const DashboardLayout = ({
 
 DashboardLayout.propTypes = {
   dashboard: PropTypes.object.isRequired,
+  user: PropTypes.object,
   isAuthenticated: PropTypes.bool,
-  getAcceptedGroups: PropTypes.func.isRequired,
 };
 DashboardLayout.defaultProps = {
   isAuthenticated: false,
+  user: null,
 };
 const mapStateToProps = (state) => ({
   dashboard: state.dashboard,
   user: state.auth.user,
   isAuthenticated: state.auth.isAuthenticated,
 });
-export default connect(mapStateToProps, { getAcceptedGroups })(DashboardLayout);
+export default connect(mapStateToProps, {})(DashboardLayout);

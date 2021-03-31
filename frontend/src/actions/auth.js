@@ -2,6 +2,7 @@
 import axios from 'axios';
 import setToken from '../utils/setToken';
 import setAlert from './alert';
+import { getAcceptedGroups } from './dashboard';
 import {
   REGISTER_SUCCESS,
   REGISTER_FAIL,
@@ -26,6 +27,7 @@ export const loadUser = () => async (dispatch) => {
       type: USER_LOADED,
       payload: res.data,
     });
+    dispatch(getAcceptedGroups());
   } catch (err) {
     dispatch({
       type: AUTH_ERROR,
@@ -78,9 +80,7 @@ export const login = ({ userEmail, userPassword, history }) => async (
       payload: res.data,
     });
     dispatch(loadUser());
-    setTimeout(() => {
-      history.push('/dashboard');
-    }, 1000);
+    history.push('/dashboard');
   } catch (err) {
     const { errors } = err.response.data;
 

@@ -60,11 +60,11 @@ router.post(
 
     try {
       await Group.findByIdAndUpdate(groupID, {
-        $addToSet: { members: req.user.id },
+        $addToSet: { members: { memberID: req.user.id } },
         $push: {
           activity: {
             actionBy: req.user.id,
-            action: `Accepted invitation to join ${groupName} group`,
+            action: `${req.user.userName} accepted invitation to join ${groupName} group`,
           },
         },
       });
@@ -146,17 +146,35 @@ router.get(
       const mygroupList = await User.findById(req.user.id, {
         groups: 1,
         invites: 1,
+        iOwe: 1,
+        owedToMe: 1,
         _id: 0,
       })
         .populate({
           path: 'groups',
           select: ['groupName', 'groupPicture', 'members'],
           populate: {
-            path: 'members',
+            path: 'members.memberID',
             select: ['userName', 'userEmail', 'userPicture'],
           },
         })
-        .populate({ path: 'invites', select: ['groupName', 'groupPicture'] });
+        .populate({ path: 'invites', select: ['groupName', 'groupPicture'] })
+        .populate({
+          path: 'iOwe.memberID',
+          select: ['userName', 'userEmail', 'userPicture'],
+        })
+        .populate({
+          path: 'owedToMe.memberID',
+          select: ['userName', 'userEmail', 'userPicture'],
+        })
+        .populate({
+          path: 'owedToMe.groupID',
+          select: ['groupName'],
+        })
+        .populate({
+          path: 'iOwe.groupID',
+          select: ['groupName'],
+        });
 
       if (!mygroupList) {
         return res.status(400).json({
@@ -178,22 +196,22 @@ router.get(
   }
 );
 
-// @route POST api/my-groups/update-group/:group_id
+// @route POST api/my-groups/update-group/
 // @desc Update group information
 // @access Private
 
 // router.post(
-//   '/update-group/:group_id',
+//   '/update-group/',
 //   [
 //     upload.single('selectedFile'),
-//     auth,
+//     passport.authenticate('jwt', { session: false }),
 //     [check('groupName', "First name can't be blank").not().isEmpty()],
 //   ],
 //   async (req, res) => {
 //     let selectedFile;
 //     const userID = req.user.id;
 
-//     const { groupName: name } = req.body;
+//     const { groupID, groupName } = req.body;
 //     if (req.file) {
 //       selectedFile = req.file.filename;
 //     }

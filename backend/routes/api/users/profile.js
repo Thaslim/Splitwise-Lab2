@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 /* eslint-disable import/extensions */
 /* eslint-disable comma-dangle */
 /* eslint-disable consistent-return */
@@ -7,8 +8,12 @@ import path from 'path';
 import validator from 'express-validator';
 import passport from 'passport';
 import multer from 'multer';
+import AWS from 'aws-sdk';
+import dotenv from 'dotenv';
+import uuid from 'uuid';
 import User from '../../../models/User.js';
 
+dotenv.config({ path: './config/.env' });
 const { check, validationResult } = validator;
 const router = express.Router();
 export default router;
@@ -16,10 +21,22 @@ export default router;
 const dirname = path.resolve(path.dirname(''));
 const destPath = `${dirname}/public/uploaded_images/users`;
 
-const storage = multer.diskStorage({
-  destination: destPath,
-  filename: (req, file, cb) => {
-    cb(null, `user ${file.originalname}`);
+// const storage = multer.diskStorage({
+//   destination: destPath,
+//   filename: (req, file, cb) => {
+//     cb(null, `user ${file.originalname}`);
+//   },
+// });
+
+const S3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_KEY,
+  region: process.env.AWS_BUCKET_REGION,
+});
+
+const storage = multer.memoryStorage({
+  destination(_req, _file, callback) {
+    callback(null, '');
   },
 });
 
@@ -71,9 +88,23 @@ router.post(
       userLanguage,
     } = req.body;
     if (req.file) {
-      filepath = req.file.filename;
-    }
+      const myFile = req.file.originalname.split('.');
+      const fileType = myFile[myFile.length - 1];
 
+      const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `${uuid()}.${fileType}`,
+        Body: req.file.buffer,
+      };
+      filepath = params.Key;
+      S3.upload(params, (error) => {
+        if (error) {
+          return res
+            .status(400)
+            .json({ errors: [{ msg: 'Error uploading file' }] });
+        }
+      });
+    }
     const errors = validationResult(req);
     let validPhone;
     let userValidPhone;

@@ -21,7 +21,7 @@ import { getAcceptedGroups } from '../../actions/dashboard';
 const EditGroup = ({
   match,
   getAcceptedGroups,
-  dashboard: { acceptedGroups, loading },
+  dashboard: { groups, loading },
   editGroupInfo,
 }) => {
   const history = useHistory();
@@ -31,29 +31,18 @@ const EditGroup = ({
   const [filePath, setFilePath] = useState('');
 
   useEffect(() => {
-    if (!acceptedGroups) getAcceptedGroups();
-    if (acceptedGroups && acceptedGroups.mygroupList.length > 0) {
-      const groupDetails = findbyID(
-        acceptedGroups.mygroupList,
-        match.params.id
-      );
+    if (!groups) getAcceptedGroups();
+    if (groups && groups.mygroupList.groups.length) {
+      const groupDetails = findbyID(groups.mygroupList.groups, match.params.id);
       setGroupName(!groupDetails[0].groupName ? '' : groupDetails[0].groupName);
 
       if (groupDetails[0].groupPicture) {
-        setFilePath(
-          path.join(
-            '/static/uploaded_images/groups',
-            groupDetails[0].groupPicture
-          )
-        );
+        setFilePath(`api/images/${groupDetails[0].groupPicture}`);
       }
-      const MemInfo = findbyID(
-        acceptedGroups.individualGroupMembers,
-        match.params.id
-      );
+      const MemInfo = findbyID(groups.individualGroupMembers, match.params.id);
       setGroupMemInfo(...groupMemInfo, MemInfo);
     }
-  }, [getAcceptedGroups, acceptedGroups, loading, match]);
+  }, [getAcceptedGroups, acceptedGroups, loading, match, groupMemInfo]);
 
   const onSaveChanges = async (e) => {
     e.preventDefault();
@@ -122,7 +111,7 @@ const EditGroup = ({
                           <img
                             src={
                               (mem.userPicture &&
-                                `/static/uploaded_images/users/${mem.userPicture}`) ||
+                                `api/images/${mem.userPicture}`) ||
                               profilePic
                             }
                             alt='profilePic'

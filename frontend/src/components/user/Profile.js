@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import path from 'path';
+
 import { useHistory } from 'react-router-dom';
 import { updateUserProfile } from '../../actions/profile';
 import defaultProfilePic from './profile-pic.png';
@@ -32,9 +32,7 @@ const Profile = ({ user, isAuthenticated, updateUserProfile }) => {
       setUserEmail(!user.userEmail ? '' : user.userEmail);
 
       if (user.userPicture) {
-        setFilePath(
-          path.join('/static/uploaded_images/users', user.userPicture)
-        );
+        setFilePath(`api/images/${user.userPicture}`);
       }
     }
   }, [isAuthenticated, user]);

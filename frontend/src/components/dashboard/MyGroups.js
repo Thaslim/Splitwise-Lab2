@@ -74,10 +74,7 @@ const MyGroups = ({
                       type='submit'
                       className='btm btn-outline-danger btn-md rounded'
                       onClick={() =>
-                        acceptGroupInvitation(
-                          `${el.groupID}`,
-                          `${el.groupName}`
-                        )
+                        acceptGroupInvitation(`${el._id}`, `${el.groupName}`)
                       }
                     >
                       Accept

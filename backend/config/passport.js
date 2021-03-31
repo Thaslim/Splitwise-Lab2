@@ -18,6 +18,10 @@ export default (passport) => {
         const user = await User.findById(jwtPayload.user.id).select([
           '-userPassword',
           '-date',
+          '-groups',
+          '-invites',
+          '-iOwe',
+          '-owedToMe',
         ]);
         if (user) {
           return done(null, user);

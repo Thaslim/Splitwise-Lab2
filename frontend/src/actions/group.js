@@ -1,7 +1,6 @@
 import axios from 'axios';
 import setAlert from './alert';
 import { loadUser } from './auth';
-
 import {
   CREATE_GROUP,
   CREATE_GROUP_ERROR,
@@ -138,6 +137,7 @@ export const acceptGroupInvitation = (groupID, groupName) => async (
     const config = {
       headers: { 'content-type': 'application/json' },
     };
+
     const body = { groupID, groupName };
     const res = await axios.post(
       'api/my-groups/accept-invitation',

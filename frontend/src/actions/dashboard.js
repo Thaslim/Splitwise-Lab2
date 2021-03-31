@@ -70,6 +70,7 @@ export const addExpense = ({ groupID, description, amount, date }) => async (
       payload: res.data,
     });
     dispatch(setAlert('Expense Added', 'success'));
+    dispatch(getAcceptedGroups());
   } catch (error) {
     const { errors } = error.response.data;
     if (errors) {

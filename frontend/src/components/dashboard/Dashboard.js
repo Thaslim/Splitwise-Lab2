@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import AddBillPopUp from '../expenses/AddBillPopUp';
 import {
@@ -17,6 +18,7 @@ import { findInArray } from '../../utils/findUtil';
 import ListBalance from './ListBalance';
 import Spinner from '../landingPage/Spinner';
 import profilePic from '../user/profile-pic.png';
+import getIndividualGroupBalance from '../../utils/getGroupBalance.js';
 import SettleUp from '../expenses/SettleUp';
 
 const Dashboard = ({
@@ -29,70 +31,77 @@ const Dashboard = ({
   const [billPopUp, setBillPopUp] = useState(false);
   const [settleUp, setSettleUp] = useState(false);
   const [cSymbol, setCSymbol] = useState('');
-  const [getBack, setGetBack] = useState();
-  const [owe, setOwe] = useState();
+  const [getBack, setGetBack] = useState(0.0);
+  const [owe, setOwe] = useState(0.0);
+  const [totalBalance, setTotalBalance] = useState(0.0);
   const [oweNames, setOweNames] = useState([]);
   const [getBackNames, setgetBackNames] = useState([]);
+  const [oweToGroupNames, setOweToGroupNames] = useState([]);
+  const [getBackFromGroupNames, setGetBackFromGroupNames] = useState([]);
 
   useEffect(() => {
     if (user) {
       setCSymbol(getSymbolFromCurrency(user.userCurrency));
     }
-    // if (isAuthenticated && !summary) getDashBoardSummary();
-    if (isAuthenticated && loading) getAcceptedGroups();
-    // if (groups && summary) {
-    //   const getBacks = summary.summary.map((val) => {
-    //     if (Object.values(val)[0] > 0) {
-    //       const memName = findInArray(
-    //         acceptedGroups.acceptedMembers,
-    //         Object.keys(val)[0]
-    //       );
-    //       setgetBackNames((getBackNames) => [
-    //         ...getBackNames,
-    //         {
-    //           name: memName.memberName,
-    //           bal: Object.values(val)[0],
-    //           pic: memName.userPicture,
-    //           email: memName.memberEmail,
-    //         },
-    //       ]);
-    //       return Object.values(val)[0];
-    //     }
-    //     return 0;
-    //   });
-    //   const owes = summary.summary.map((val) => {
-    //     if (Object.values(val)[0] < 0) {
-    //       const memName = findInArray(
-    //         acceptedGroups.acceptedMembers,
-    //         Object.keys(val)[0]
-    //       );
-    //       setOweNames((oweNames) => [
-    //         ...oweNames,
-    //         {
-    //           name: memName.memberName,
-    //           bal: Object.values(val)[0],
-    //           pic: memName.userPicture,
-    //           email: memName.memberEmail,
-    //         },
-    //       ]);
-    //       return Object.values(val)[0];
-    //     }
-    //     return 0;
-    //   });
-    //   setGetBack(roundToTwo(reducedSum(getBacks)));
-    //   setOwe(roundToTwo(reducedSum(owes)));
-    // }
-  }, [
-    getDashBoardSummary,
-    getAcceptedGroups,
-    isAuthenticated,
-    summary,
-    summaryLoading,
-    user,
-    loading,
-  ]);
 
-  return (
+    if (isAuthenticated && !groups && loading) getAcceptedGroups();
+    if (user && groups && groups.mygroupList.iOwe.length) {
+      const uniqueIoweMembers = _(groups.mygroupList.iOwe)
+        .groupBy('memberID._id')
+        .map((obj, key) => ({
+          memberName: obj[0].memberID.userName,
+          amount: _.sumBy(obj, 'amount'),
+          memberPic: obj[0].memberID.userPicture || '',
+        }))
+        .value();
+      setOweNames(uniqueIoweMembers);
+
+      const memBalanceEachGroup = getIndividualGroupBalance(
+        groups.mygroupList.iOwe
+      );
+      setOweToGroupNames(memBalanceEachGroup);
+    }
+
+    if (user && groups && groups.mygroupList.owedToMe.length) {
+      const uniqueOweToMeMembers = _(groups.mygroupList.owedToMe)
+        .groupBy('memberID._id')
+        .map((obj, key) => ({
+          memberName: obj[0].memberID.userName,
+          amount: roundToTwo(_.sumBy(obj, 'amount')),
+          memberPic: obj[0].memberID.userPicture || '',
+        }))
+        .value();
+      setgetBackNames(uniqueOweToMeMembers);
+      const memBalanceEachGroup = getIndividualGroupBalance(
+        groups.mygroupList.owedToMe
+      );
+      setGetBackFromGroupNames(memBalanceEachGroup);
+    }
+
+    if (user && groups && groups.mygroupList.groups.length) {
+      const allMembers = groups.mygroupList.groups.map((el) => el.members);
+      const mergedAccMembers = allMembers.flat(1);
+      const uniqueMembers = _(mergedAccMembers)
+        .groupBy('memberID._id')
+        .map((obj, key) => ({
+          memberID: key,
+          getBack: roundToTwo(_.sumBy(obj, 'getBack')),
+          give: roundToTwo(_.sumBy(obj, 'give')),
+        }))
+        .value();
+
+      const myBalance = uniqueMembers.filter(
+        (mem) => mem.memberID === user._id
+      );
+      setGetBack(myBalance[0].getBack);
+      setOwe(myBalance[0].give);
+      setTotalBalance(roundToTwo(myBalance[0].getBack - myBalance[0].give));
+    }
+  }, [getAcceptedGroups, isAuthenticated, user, loading, groups]);
+
+  return loading || !groups ? (
+    <Spinner />
+  ) : (
     <div className='center-bars'>
       <div className='dashboard'>
         <div className='topbar'>
@@ -123,8 +132,8 @@ const Dashboard = ({
           </div>
         </div>
 
-        {/* <div className='total_balances'>
-          {!groups && (
+        <div className='total_balances'>
+          {!groups.mygroupList.groups.length && (
             <>
               <h3>Welcome to Splitwise!</h3>
               <h5>
@@ -133,7 +142,7 @@ const Dashboard = ({
               </h5>
             </>
           )}
-          {!summary && (
+          {!totalBalance && (
             <>
               <h3>Welcome to Splitwise!</h3>
               <h5>Add an expense to get started!</h5>
@@ -142,20 +151,28 @@ const Dashboard = ({
           <div className='row'>
             <div className='col block'>
               <div className='title'>total balance</div>
-
-              {summary && summary.totalBalance > 0 && (
-                <span className='positive'>
+              {groups && !totalBalance && (
+                <span className='neutral'>
                   <strong>
-                    + {cSymbol}
-                    {roundToTwo(summary.totalBalance)}
+                    {cSymbol}
+                    {totalBalance}
                   </strong>
                 </span>
               )}
-              {summary && summary.totalBalance < 0 && (
+
+              {groups && totalBalance > 0 && (
+                <span className='positive'>
+                  <strong>
+                    + {cSymbol}
+                    {totalBalance}
+                  </strong>
+                </span>
+              )}
+              {groups && totalBalance < 0 && (
                 <span className='negative'>
                   <strong>
                     - {cSymbol}
-                    {roundToTwo(-summary.totalBalance)}
+                    {-totalBalance}
                   </strong>
                 </span>
               )}
@@ -163,22 +180,22 @@ const Dashboard = ({
             <div className='col block '>
               <div className='title'>you owe</div>
 
-              {summary && !owe && (
+              {groups && !owe && (
                 <span className='neutral'>
                   {cSymbol}
                   {owe}
                 </span>
               )}
-              {summary && owe < 0 && (
+              {groups && owe > 0 && (
                 <span className='negative'>
-                  -{cSymbol}
-                  {-owe}
+                  {cSymbol}
+                  {owe}
                 </span>
               )}
             </div>
             <div className='col block'>
               <div className='title'>you are owed</div>
-              {summary && getBack > 0 && (
+              {groups && getBack > 0 && (
                 <span className='positive'>
                   <strong>
                     {cSymbol}
@@ -186,7 +203,7 @@ const Dashboard = ({
                   </strong>
                 </span>
               )}
-              {summary && !getBack && (
+              {groups && !getBack && (
                 <span className='neutral'>
                   {cSymbol}
                   {getBack}
@@ -211,23 +228,23 @@ const Dashboard = ({
             </h2>
           </div>
         </div>
-        <div className='container balances'> */}
-        {/* <div className='row'>
+        <div className='container balances'>
+          <div className='row'>
             <div className='col negatives'>
-              {!owe && <>You do not owe anything</>}
+              {!owe && <span className='neutral'>You do not owe anything</span>}
               <ul>
-                {owe !== 0 &&
+                {owe > 0 &&
                   oweNames.map((val) => (
                     <li key={Math.random()}>
                       <ListBalance
-                        name={val.name}
+                        name={val.memberName}
                         cls='negative'
-                        amount={roundToTwo(val.bal)}
+                        amount={val.amount}
                         csymbol={cSymbol}
                         txt='you owe'
+                        groupNames={oweToGroupNames}
                         imgSrc={
-                          (val.pic &&
-                            `/static/uploaded_images/users/${val.pic}`) ||
+                          (val.memberPic && `api/images/${val.memberPic}`) ||
                           profilePic
                         }
                       />
@@ -237,29 +254,32 @@ const Dashboard = ({
             </div>
 
             <div className='col'>
-              {!getBack && <>You are not owed anything</>}
+              {!getBack && (
+                <span className='neutral'>You are not owed anything</span>
+              )}
               <ul>
-                {getBack !== 0 &&
+                {getBack > 0 &&
                   getBackNames.map((val) => (
                     <li key={Math.random()}>
                       <ListBalance
-                        name={val.name}
+                        name={val.memberName}
                         cls='positive'
-                        amount={roundToTwo(val.bal)}
+                        amount={val.amount}
                         csymbol={cSymbol}
+                        groupNames={getBackFromGroupNames}
                         txt='owes you'
                         imgSrc={
-                          (val.pic &&
-                            `/static/uploaded_images/users/${val.pic}`) ||
+                          (val.memberPic && `api/images/${val.memberPic}`) ||
                           profilePic
                         }
                       />
+                      <br />
                     </li>
                   ))}
               </ul>
             </div>
           </div>
-        </div> */}
+        </div>
         {billPopUp && (
           <>
             <AddBillPopUp
@@ -287,7 +307,7 @@ const Dashboard = ({
 };
 
 Dashboard.propTypes = {
-  user: PropTypes.array,
+  user: PropTypes.object,
   isAuthenticated: PropTypes.bool,
   getDashBoardSummary: PropTypes.func.isRequired,
   getAcceptedGroups: PropTypes.func.isRequired,
@@ -299,7 +319,6 @@ Dashboard.defaultProps = {
   isAuthenticated: false,
 };
 const mapStateToProps = (state) => ({
-  acceptedGroups: state.dashboard.acceptedGroups,
   user: state.auth.user,
   dashboard: state.dashboard,
   isAuthenticated: state.auth.isAuthenticated,

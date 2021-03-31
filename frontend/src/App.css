@@ -207,7 +207,7 @@ input[type='file'] {
 
 span {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 2px;
 }
 
 select {
@@ -387,4 +387,8 @@ select {
   /* position: relative; */
   /* float: left; */
   clear: none;
+}
+
+.neutral {
+  color: #aaa;
 }

@@ -1,5 +1,17 @@
 import mongoose from 'mongoose';
 
+const MemberBalanceSchema = new mongoose.Schema({
+  memberID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+  },
+  amount: { type: Number, default: 0.0 },
+  groupID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'group',
+  },
+});
+
 const UserSchema = new mongoose.Schema({
   userName: {
     type: String,
@@ -47,6 +59,8 @@ const UserSchema = new mongoose.Schema({
       ref: 'group',
     },
   ],
+  iOwe: [MemberBalanceSchema],
+  owedToMe: [MemberBalanceSchema],
 });
 
 export default mongoose.model('user', UserSchema);

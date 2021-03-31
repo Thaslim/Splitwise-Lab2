@@ -1,5 +1,14 @@
 import mongoose from 'mongoose';
 
+const MemberSchema = new mongoose.Schema({
+  memberID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+  },
+  getBack: { type: Number, default: 0.0 },
+  give: { type: Number, default: 0.0 },
+});
+
 const ActivitySchema = new mongoose.Schema({
   actionBy: {
     type: mongoose.Schema.Types.ObjectId,
@@ -19,12 +28,7 @@ const GroupSchema = new mongoose.Schema({
     ref: 'user',
   },
   groupPicture: { type: String },
-  members: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'user',
-    },
-  ],
+  members: [MemberSchema],
   expenses: [
     {
       type: mongoose.Schema.Types.ObjectId,

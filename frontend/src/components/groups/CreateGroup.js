@@ -42,10 +42,7 @@ const CreateGroup = ({
   useEffect(() => {
     if (user) {
       getAllUsers();
-      user.userPicture &&
-        setFilePath(
-          path.join('/static/uploaded_images/users', user.userPicture)
-        );
+      user.userPicture && setFilePath(`api/images/${user.userPicture}`);
     }
   }, [user, createNewGroup, getAllUsers]);
 
@@ -80,7 +77,7 @@ const CreateGroup = ({
     if (selectedUser[0].userPicture) {
       updatedMembers[
         idx
-      ].memberPicture = `/static/uploaded_images/users/${selectedUser[0].userPicture}`;
+      ].memberPicture = `api/images/${selectedUser[0].userPicture}`;
     }
     setGroupMembers(updatedMembers);
   };

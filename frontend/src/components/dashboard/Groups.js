@@ -1,9 +1,3 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable comma-dangle */
-/* eslint-disable operator-linebreak */
-/* eslint-disable no-shadow */
-/* eslint-disable object-curly-newline */
-/* eslint-disable react/forbid-prop-types */
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { NavLink, useHistory } from 'react-router-dom';
@@ -11,7 +5,7 @@ import PropTypes from 'prop-types';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import AddBillPopUp from '../expenses/AddBillPopUp';
 import { getGroupActivity } from '../../actions/group';
-import { findInArray, findbyID, sortArray } from '../../utils/findUtil';
+import { findbyID, sortArray } from '../../utils/findUtil';
 import Spinner from '../landingPage/Spinner';
 import profilePic from '../user/profile-pic.png';
 import SettleUp from '../expenses/SettleUp';
@@ -19,7 +13,6 @@ import ListExpenses from './ListExpenses';
 import { roundToTwo } from '../../utils/calc';
 import GroupBalanceList from './GroupBalanceList';
 import { getAcceptedGroups } from '../../actions/dashboard';
-import { loadUser } from '../../actions/auth';
 
 const Groups = ({
   group: { groupActivity, groups },
@@ -32,7 +25,7 @@ const Groups = ({
   const [billPopUp, setBillPopUp] = useState(false);
   const [settleUp, setSettleUp] = useState(false);
   const [cSymbol, setCSymbol] = useState('');
-  const [oweNames, setOweNames] = useState([]);
+
   const [groupName, setGroupName] = useState('');
   const [groupImg, setGroupImg] = useState('');
   const [memCount, setMemCount] = useState();

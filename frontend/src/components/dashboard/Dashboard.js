@@ -1,20 +1,11 @@
-/* eslint-disable comma-dangle */
-/* eslint-disable operator-linebreak */
-/* eslint-disable no-shadow */
-/* eslint-disable object-curly-newline */
-/* eslint-disable react/forbid-prop-types */
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import AddBillPopUp from '../expenses/AddBillPopUp';
-import {
-  getAcceptedGroups,
-  getDashBoardSummary,
-} from '../../actions/dashboard';
-import { roundToTwo, reducedSum } from '../../utils/calc';
-import { findInArray } from '../../utils/findUtil';
+import { getAcceptedGroups } from '../../actions/dashboard';
+import { roundToTwo } from '../../utils/calc';
 import ListBalance from './ListBalance';
 import Spinner from '../landingPage/Spinner';
 import profilePic from '../user/profile-pic.png';

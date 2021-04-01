@@ -1,6 +1,3 @@
-/* eslint-disable object-curly-newline */
-/* eslint-disable react/forbid-prop-types */
-/* eslint-disable no-use-before-define */
 import React from 'react';
 import { TextField, makeStyles } from '@material-ui/core';
 import { Autocomplete, createFilterOptions } from '@material-ui/lab';

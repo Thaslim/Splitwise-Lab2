@@ -1,9 +1,3 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable comma-dangle */
-/* eslint-disable operator-linebreak */
-/* eslint-disable no-shadow */
-/* eslint-disable object-curly-newline */
-/* eslint-disable react/forbid-prop-types */
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { NavLink, useHistory } from 'react-router-dom';

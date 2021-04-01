@@ -1,4 +1,3 @@
-// import api from '../utils/api';
 import axios from 'axios';
 import setToken from '../utils/setToken';
 import setAlert from './alert';
@@ -12,7 +11,6 @@ import {
   LOGIN_FAIL,
   LOGOUT,
   CLEAR_GROUPS,
-  CLEAR_DASHBOARD,
 } from './types';
 
 // Load User

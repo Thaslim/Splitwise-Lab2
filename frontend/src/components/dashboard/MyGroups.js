@@ -1,9 +1,3 @@
-/* eslint-disable react/jsx-curly-newline */
-/* eslint-disable implicit-arrow-linebreak */
-/* eslint-disable operator-linebreak */
-/* eslint-disable react/forbid-prop-types */
-
-/* eslint-disable no-shadow */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';

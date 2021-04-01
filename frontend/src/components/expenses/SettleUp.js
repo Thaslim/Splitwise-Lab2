@@ -1,7 +1,3 @@
-/* eslint-disable no-shadow */
-/* eslint-disable object-curly-newline */
-/* eslint-disable operator-linebreak */
-/* eslint-disable react/forbid-prop-types */
 import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
 import { connect } from 'react-redux';

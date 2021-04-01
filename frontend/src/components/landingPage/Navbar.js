@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import Spinner from '../landingPage/Spinner';
 import { logout } from '../../actions/auth';
 import capitalize from '../../utils/capitalize';
 import splitwiselogo from './splitwise.svg';

@@ -1,5 +1,3 @@
-/* eslint-disable object-curly-newline */
-/* eslint-disable react/prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
 import profilePic from '../user/profile-pic.png';

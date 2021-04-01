@@ -1,7 +1,3 @@
-/* eslint-disable operator-linebreak */
-/* eslint-disable import/extensions */
-/* eslint-disable comma-dangle */
-/* eslint-disable consistent-return */
 import express from 'express';
 import phone from 'phone';
 import validator from 'express-validator';

@@ -20,8 +20,7 @@ import imageRetrieve from './routes/api/aws-s3/retrieve-file.js';
 dotenv.config({ path: './config/.env' });
 
 const app = express();
-const dirname = path.resolve(path.dirname(''));
-app.use('/static', express.static(path.join(dirname, 'public')));
+
 connectDB();
 // passport configure
 app.use(passport.initialize());

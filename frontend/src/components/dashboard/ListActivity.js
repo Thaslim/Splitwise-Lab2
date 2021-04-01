@@ -1,6 +1,3 @@
-/* eslint-disable indent */
-/* eslint-disable operator-linebreak */
-/* eslint-disable object-curly-newline */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { getMonthDate } from '../../utils/findUtil';

@@ -1,20 +1,9 @@
-/* eslint-disable implicit-arrow-linebreak */
-/* eslint-disable operator-linebreak */
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable comma-dangle */
-/* eslint-disable react/forbid-prop-types */
-/* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/jsx-no-duplicate-props */
-
 import React, { useState, useEffect } from 'react';
-import { Link, Redirect, useHistory } from 'react-router-dom';
-import path from 'path';
+import { Link, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes, { object } from 'prop-types';
-
 import splitwiselogo from '../landingPage/splitwise.svg';
-
 import { getAllUsers, createNewGroup } from '../../actions/group';
 import profilePic from '../user/profile-pic.png';
 import FreeSolo from './AutocompleteInput';

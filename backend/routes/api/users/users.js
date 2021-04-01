@@ -1,6 +1,3 @@
-/* eslint-disable comma-dangle */
-/* eslint-disable consistent-return */
-/* eslint-disable import/extensions */
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';

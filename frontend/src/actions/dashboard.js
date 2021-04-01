@@ -1,4 +1,3 @@
-/* eslint-disable object-curly-newline */
 import axios from 'axios';
 import setAlert from './alert';
 

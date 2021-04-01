@@ -16,6 +16,13 @@ import {
   GET_RECENT_ACTIVITY,
   GET_RECENT_ACTIVITY_ERROR,
   CLEAR_RECENT_ACTIVITY,
+  GET_GROUPS,
+  GET_GROUPS_ERROR,
+  CLEAR_GROUPS,
+  ADD_EXPENSE_ERROR,
+  ADD_EXPENSE,
+  SETTLE_EXPENSE,
+  SETTLE_EXPENSE_ERROR,
 } from '../actions/types';
 
 const initialState = {
@@ -23,9 +30,14 @@ const initialState = {
   registeredUsersList: [],
   error: {},
   groupActivity: null,
-  groupInfo: null,
+  groupInfo: '',
   invitation: '',
   recentactivity: null,
+
+  groups: null,
+  loading: true,
+  expenseAdded: false,
+  expenseSettled: false,
 };
 
 function groupReducer(state = initialState, action) {
@@ -67,6 +79,7 @@ function groupReducer(state = initialState, action) {
       return {
         ...state,
         groupActivity: null,
+        groupInfo: '',
       };
 
     case ACCEPT_INVITATION:
@@ -91,6 +104,52 @@ function groupReducer(state = initialState, action) {
         ...state,
         recentactivity: null,
       };
+
+    case GET_GROUPS:
+      return {
+        ...state,
+        groups: payload,
+        loading: false,
+        groupInfo: '',
+      };
+
+    case GET_GROUPS_ERROR:
+      return {
+        ...state,
+        error: payload,
+        loading: false,
+      };
+    case CLEAR_GROUPS:
+      return {
+        ...state,
+        groups: null,
+        loading: false,
+      };
+    case ADD_EXPENSE:
+      return {
+        ...state,
+        expenseAdded: true,
+      };
+
+    case ADD_EXPENSE_ERROR:
+      return {
+        ...state,
+        error: payload,
+        expenseAdded: false,
+      };
+    case SETTLE_EXPENSE:
+      return {
+        ...state,
+        expenseSettled: true,
+      };
+
+    case SETTLE_EXPENSE_ERROR:
+      return {
+        ...state,
+        error: payload,
+        expenseSettled: true,
+      };
+
     default:
       return state;
   }

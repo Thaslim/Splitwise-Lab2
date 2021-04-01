@@ -27,8 +27,8 @@ export const loadUser = () => async (dispatch) => {
       type: USER_LOADED,
       payload: res.data,
     });
-    dispatch(getAcceptedGroups());
   } catch (err) {
+    console.log(err);
     dispatch({
       type: AUTH_ERROR,
     });
@@ -51,6 +51,7 @@ export const signup = ({ userName, userEmail, userPassword }) => async (
       payload: res.data,
     });
     dispatch(loadUser());
+    dispatch(getAcceptedGroups());
   } catch (err) {
     const { errors } = err.response.data;
 
@@ -80,6 +81,7 @@ export const login = ({ userEmail, userPassword, history }) => async (
       payload: res.data,
     });
     dispatch(loadUser());
+    dispatch(getAcceptedGroups());
     history.push('/dashboard');
   } catch (err) {
     const { errors } = err.response.data;
@@ -97,6 +99,5 @@ export const login = ({ userEmail, userPassword, history }) => async (
 // Logout
 export const logout = () => (dispatch) => {
   dispatch({ type: CLEAR_GROUPS });
-  dispatch({ type: CLEAR_DASHBOARD });
   dispatch({ type: LOGOUT });
 };

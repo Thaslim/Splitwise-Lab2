@@ -20,30 +20,27 @@ export default router;
 // @route GET api/groups/:group_id
 // @desc Get expense by group id
 // @access Private
-// router.get(
-//   '/:id',
-//   passport.authenticate('jwt', { session: false }),
-//   async (req, res) => {
-//     try {
-//       const groupExpense = await splitwisedb.getGroupExpense(
-//         req.params.id,
-//         req.user.key
-//       );
-//       const memCount = await splitwisedb.getGroupMemberIDs(req.params.id);
-//       const groupMemberBalance = await splitwisedb.getGroupBalances(
-//         req.params.id
-//       );
-//       res.json({
-//         groups: groupExpense,
-//         memCount: memCount.length,
-//         groupMemberBalance: groupMemberBalance,
-//       });
-//     } catch (error) {
-//       console.error(error.message);
-//       res.status(500).send('Server error');
-//     }
-//   }
-// );
+router.get(
+  '/:id',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      const groupExpense = await Group.findById(req.params.id, {
+        expenses: 1,
+      }).populate({
+        path: 'expenses',
+        select: ['paidByName', 'paidByEmail', 'description', 'amount', 'date'],
+      });
+
+      res.json({
+        groupExpense,
+      });
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send('Server error');
+    }
+  }
+);
 
 // @route POST api/groups/:group_id
 // @desc Add expense
@@ -64,6 +61,7 @@ router.post(
   async (req, res) => {
     const { groupID, description, amount, date } = req.body;
     const paidByEmail = req.user.userEmail;
+    const paidByName = req.user.userName;
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -71,7 +69,13 @@ router.post(
     }
 
     try {
-      const expense = new Expense({ description, amount, paidByEmail, date });
+      const expense = new Expense({
+        description,
+        amount,
+        paidByEmail,
+        paidByName,
+        date,
+      });
       expense.save();
       const groupInfo = await Group.findById(groupID, {
         members: 1,

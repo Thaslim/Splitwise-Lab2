@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import Spinner from '../landingPage/Spinner';
 import { logout } from '../../actions/auth';
 import capitalize from '../../utils/capitalize';
 import splitwiselogo from './splitwise.svg';
@@ -14,15 +15,17 @@ const Navbar = ({ user, isAuthenticated, loading, logout }) => {
   const [nameFormat, setNameFormat] = useState('');
 
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (!loading && isAuthenticated && user) {
       if (user.userName) {
         setNameFormat(capitalize(user.userName));
       }
       if (user.userPicture) {
         setFp(`api/images/${user.userPicture}`);
+      } else {
+        setFp(profilePic);
       }
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, loading, user]);
 
   const toggleOpen = () => {
     setMenuOpen(!menuOpen);
@@ -42,9 +45,7 @@ const Navbar = ({ user, isAuthenticated, loading, logout }) => {
           aria-haspopup='true'
           aria-expanded='false'
         >
-          {user && (
-            <img src={fp || profilePic} className='userImage' alt='prfilePic' />
-          )}
+          {user && <img src={fp} className='userImage' alt='prfilePic' />}
           &nbsp;
           {user && nameFormat}
         </Link>
@@ -83,7 +84,7 @@ const Navbar = ({ user, isAuthenticated, loading, logout }) => {
       </li>
     </ul>
   );
-  const link = !loading && isAuthenticated ? '/dashboard' : '/';
+  const link = isAuthenticated ? '/dashboard' : '/';
   return (
     <div className='container-fluid'>
       <nav className='navbar navbar-expand-md navbar-light bg-white'>

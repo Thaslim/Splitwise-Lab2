@@ -1,6 +1,7 @@
 import axios from 'axios';
 import setAlert from './alert';
 import { loadUser } from './auth';
+import { getAcceptedGroups } from './dashboard';
 import {
   CREATE_GROUP,
   CREATE_GROUP_ERROR,
@@ -55,6 +56,7 @@ export const createNewGroup = (groupData, history) => async (dispatch) => {
     });
     dispatch(setAlert('Group created', 'success'));
     dispatch(loadUser());
+    dispatch(getAcceptedGroups());
     setTimeout(() => {
       history.push('/dashboard');
     }, 300);
@@ -75,7 +77,6 @@ export const createNewGroup = (groupData, history) => async (dispatch) => {
 
 // Get Group Activity
 export const getGroupActivity = (groupID) => async (dispatch) => {
-  dispatch({ type: CLEAR_GROUP_ACTIVITY });
   try {
     const res = await axios.get(`/api/groups/${groupID}`);
     dispatch({
@@ -98,15 +99,13 @@ export const getGroupActivity = (groupID) => async (dispatch) => {
 };
 
 // edit group info based on id
-export const editGroupInfo = (groupID, groupData, history) => async (
-  dispatch
-) => {
+export const editGroupInfo = (groupData, history) => async (dispatch) => {
   try {
     const config = {
       headers: { 'content-type': 'multipart/form-data' },
     };
     const res = await axios.post(
-      `/api/my-groups/update-group/${groupID}`,
+      '/api/my-groups/update-group',
       groupData,
       config
     );
@@ -116,7 +115,7 @@ export const editGroupInfo = (groupID, groupData, history) => async (
     });
     dispatch(setAlert('GroupInfo updated', 'success'));
     setTimeout(() => {
-      history.goBack();
+      history.push('/dashboard');
     }, 500);
   } catch (error) {
     dispatch({
@@ -150,7 +149,7 @@ export const acceptGroupInvitation = (groupID, groupName) => async (
     });
     dispatch(setAlert('Invitation Accepted', 'success'));
     dispatch(loadUser());
-    // dispatch(getGroupActivity(`${groupID}`));
+    dispatch(getAcceptedGroups());
   } catch (error) {
     const { errors } = error.response.data;
     if (errors) {

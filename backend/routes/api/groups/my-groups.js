@@ -4,21 +4,27 @@
 import express from 'express';
 import path from 'path';
 import multer from 'multer';
+import AWS from 'aws-sdk';
 import validator from 'express-validator';
 import passport from 'passport';
 import User from '../../../models/User.js';
 import Group from '../../../models/Group.js';
+import uuid from 'uuid';
 
-const dirname = path.resolve(path.dirname(''));
 const { check, validationResult } = validator;
 
-const destPath = `${dirname}/public/uploaded_images/groups`;
 const router = express.Router();
 export default router;
-const storage = multer.diskStorage({
-  destination: destPath,
-  filename: (req, file, cb) => {
-    cb(null, `group_${file.originalname}`);
+
+const S3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_KEY,
+  region: process.env.AWS_BUCKET_REGION,
+});
+
+const storage = multer.memoryStorage({
+  destination(_req, _file, callback) {
+    callback(null, '');
   },
 });
 
@@ -200,49 +206,74 @@ router.get(
 // @desc Update group information
 // @access Private
 
-// router.post(
-//   '/update-group/',
-//   [
-//     upload.single('selectedFile'),
-//     passport.authenticate('jwt', { session: false }),
-//     [check('groupName', "First name can't be blank").not().isEmpty()],
-//   ],
-//   async (req, res) => {
-//     let selectedFile;
-//     const userID = req.user.id;
+router.post(
+  '/update-group',
+  [
+    upload.single('selectedFile'),
+    passport.authenticate('jwt', { session: false }),
+    [check('groupName', "First name can't be blank").not().isEmpty()],
+  ],
+  async (req, res) => {
+    const userID = req.user.id;
+    let groupPicture;
+    const { groupID, groupName } = req.body;
+    if (req.file) {
+      const myFile = req.file.originalname.split('.');
+      const fileType = myFile[myFile.length - 1];
 
-//     const { groupID, groupName } = req.body;
-//     if (req.file) {
-//       selectedFile = req.file.filename;
-//     }
+      const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `${uuid()}.${fileType}`,
+        Body: req.file.buffer,
+      };
 
-//     const errors = validationResult(req);
+      S3.upload(params, (error) => {
+        if (error) {
+          return res
+            .status(400)
+            .json({ errors: [{ msg: 'Error uploading file' }] });
+        }
+      });
+      groupPicture = params.Key;
+    }
 
-//     if (!errors.isEmpty()) {
-//       return res.status(400).json({ errors: errors.array() });
-//     }
+    const errors = validationResult(req);
 
-//     try {
-//       const checkUniqueGroupName = await splitwisedb.checkGroupName(name, userID);
-//       if (checkUniqueGroupName.length > 0) {
-//         return res.status(400).json({
-//           errors: [
-//             {
-//               msg: `Whoops! ${name} group already exists`,
-//             },
-//           ],
-//         });
-//       }
-//       const updatedGroup = await splitwisedb.updateGroup(
-//         req.params.group_id,
-//         name,
-//         selectedFile,
-//       );
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-//       return res.json(updatedGroup);
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).send('Server error');
-//     }
-//   },
-// );
+    try {
+      const groupInfo = await Group.findById(groupID, { groupName: 1 });
+      if (groupInfo.groupName !== groupName) {
+        const myGroupNames = await User.findOne({ _id: userID }, { groups: 1 })
+          .populate('groups', '-_id groupName')
+          .select(['-_id']);
+        const checkUniqueGroupNames = myGroupNames.groups.filter(
+          (el) => el.groupName === groupName
+        );
+
+        if (checkUniqueGroupNames.length) {
+          return res.status(400).json({
+            errors: [
+              {
+                msg: `Whoops! ${groupName} group already exists`,
+              },
+            ],
+          });
+        }
+      }
+
+      const GroupFields = { groupName, groupPicture };
+
+      await Group.findByIdAndUpdate(groupID, {
+        $set: GroupFields,
+      });
+
+      return res.json('Updated');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    }
+  }
+);

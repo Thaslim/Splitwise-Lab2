@@ -6,13 +6,14 @@ import profilePic from '../user/profile-pic.png';
 
 const GroupBalanceList = ({ cls, email, amount, csymbol, imgSrc, txt }) => {
   const src = imgSrc.userPicture
-    ? `/static/uploaded_images/users/${imgSrc.userPicture}`
+    ? `http://localhost:3000/api/images/${imgSrc.userPicture}`
     : profilePic;
 
   return (
     <div className='groupMembers' data-testid='groupbalance'>
       <img src={src} style={{ float: 'left' }} alt='Avatar' />
-      <span style={{ fontSize: '0.85rem', display: 'table' }}>
+      &nbsp;
+      <span style={{ fontSize: '0.85rem', display: 'inline' }}>
         <strong
           style={{
             paddingLeft: '2%',
@@ -24,11 +25,15 @@ const GroupBalanceList = ({ cls, email, amount, csymbol, imgSrc, txt }) => {
           {email}
         </strong>
       </span>
-
       <span style={{ paddingLeft: '10%', fontSize: '11px' }}>
-        {txt}
-        <span data-testid='amount' className={cls} style={{ fontSize: '14px' }}>
-          {csymbol} {amount}
+        {txt} &nbsp;
+        <span
+          data-testid='amount'
+          className={cls}
+          style={{ fontSize: '14px', display: 'inline' }}
+        >
+          {csymbol}
+          {amount}
         </span>
       </span>
     </div>
@@ -41,7 +46,7 @@ GroupBalanceList.propTypes = {
   amount: PropTypes.number.isRequired,
   csymbol: PropTypes.string.isRequired,
   txt: PropTypes.string.isRequired,
-  imgSrc: PropTypes.string.isRequired,
+  imgSrc: PropTypes.object.isRequired,
 };
 
 export default GroupBalanceList;

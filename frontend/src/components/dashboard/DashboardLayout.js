@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import Spinner from '../landingPage/Spinner';
 
 const DashboardLayout = ({
-  dashboard: { groups, loading },
+  group: { groups, loading },
 
   user,
   isAuthenticated,
@@ -20,7 +20,7 @@ const DashboardLayout = ({
     }
   }, [groups, user, loading, isAuthenticated]);
 
-  return loading && groups === null ? (
+  return loading || !groups ? (
     <Spinner />
   ) : (
     <div className='side_bar'>
@@ -100,7 +100,7 @@ const DashboardLayout = ({
 };
 
 DashboardLayout.propTypes = {
-  dashboard: PropTypes.object.isRequired,
+  group: PropTypes.object.isRequired,
   user: PropTypes.object,
   isAuthenticated: PropTypes.bool,
 };
@@ -109,7 +109,7 @@ DashboardLayout.defaultProps = {
   user: null,
 };
 const mapStateToProps = (state) => ({
-  dashboard: state.dashboard,
+  group: state.group,
   user: state.auth.user,
   isAuthenticated: state.auth.isAuthenticated,
 });

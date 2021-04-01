@@ -22,9 +22,8 @@ import getIndividualGroupBalance from '../../utils/getGroupBalance.js';
 import SettleUp from '../expenses/SettleUp';
 
 const Dashboard = ({
-  dashboard: { groups, loading, summary, summaryLoading },
+  group: { groupInfo, groups, loading },
   user,
-  getDashBoardSummary,
   getAcceptedGroups,
   isAuthenticated,
 }) => {
@@ -44,13 +43,17 @@ const Dashboard = ({
       setCSymbol(getSymbolFromCurrency(user.userCurrency));
     }
 
-    if (isAuthenticated && !groups && loading) getAcceptedGroups();
+    if ((user && !groups) || groupInfo === 'Updated') {
+      console.log('Herwe');
+
+      getAcceptedGroups();
+    }
     if (user && groups && groups.mygroupList.iOwe.length) {
       const uniqueIoweMembers = _(groups.mygroupList.iOwe)
         .groupBy('memberID._id')
         .map((obj, key) => ({
           memberName: obj[0].memberID.userName,
-          amount: _.sumBy(obj, 'amount'),
+          amount: roundToTwo(_.sumBy(obj, 'amount')),
           memberPic: obj[0].memberID.userPicture || '',
         }))
         .value();
@@ -97,7 +100,7 @@ const Dashboard = ({
       setOwe(myBalance[0].give);
       setTotalBalance(roundToTwo(myBalance[0].getBack - myBalance[0].give));
     }
-  }, [getAcceptedGroups, isAuthenticated, user, loading, groups]);
+  }, [getAcceptedGroups, isAuthenticated, user, loading, groups, groupInfo]);
 
   return loading || !groups ? (
     <Spinner />
@@ -309,9 +312,8 @@ const Dashboard = ({
 Dashboard.propTypes = {
   user: PropTypes.object,
   isAuthenticated: PropTypes.bool,
-  getDashBoardSummary: PropTypes.func.isRequired,
   getAcceptedGroups: PropTypes.func.isRequired,
-  dashboard: PropTypes.object.isRequired,
+  group: PropTypes.object.isRequired,
 };
 
 Dashboard.defaultProps = {
@@ -320,10 +322,9 @@ Dashboard.defaultProps = {
 };
 const mapStateToProps = (state) => ({
   user: state.auth.user,
-  dashboard: state.dashboard,
+  group: state.group,
   isAuthenticated: state.auth.isAuthenticated,
 });
 export default connect(mapStateToProps, {
   getAcceptedGroups,
-  getDashBoardSummary,
 })(Dashboard);

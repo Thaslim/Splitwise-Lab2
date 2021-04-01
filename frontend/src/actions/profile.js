@@ -1,6 +1,7 @@
 import axios from 'axios';
 import setAlert from './alert';
 import { loadUser } from './auth';
+import { getAcceptedGroups } from './dashboard';
 
 import { UPDATE_PROFILE, UPDATE_PROFILE_ERROR } from './types';
 
@@ -17,6 +18,7 @@ export const updateUserProfile = (profileData, history) => async (dispatch) => {
     });
     dispatch(setAlert('Profile updated', 'success'));
     dispatch(loadUser());
+    dispatch(getAcceptedGroups());
     setTimeout(() => {
       history.push('/dashboard');
     }, 800);

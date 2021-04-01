@@ -20,7 +20,7 @@ const MyGroups = ({
   leaveGroup,
   isAuthenticated,
   acceptGroupInvitation,
-  dashboard: { groups },
+  group: { groups },
 }) => {
   const [accList, setAccList] = useState([]);
   const [invites, setInvites] = useState([]);
@@ -147,7 +147,7 @@ MyGroups.propTypes = {
   isAuthenticated: PropTypes.bool,
   acceptGroupInvitation: PropTypes.func.isRequired,
   leaveGroup: PropTypes.func.isRequired,
-  dashboard: PropTypes.object.isRequired,
+  group: PropTypes.object.isRequired,
   getAcceptedGroups: PropTypes.func.isRequired,
 };
 
@@ -157,7 +157,7 @@ MyGroups.defaultProps = {
 };
 const mapStateToProps = (state) => ({
   user: state.auth.user,
-  dashboard: state.dashboard,
+  group: state.dashboard,
   isAuthenticated: state.auth.isAuthenticated,
 });
 export default connect(mapStateToProps, {

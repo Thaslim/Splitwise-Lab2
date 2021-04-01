@@ -7,8 +7,6 @@ import {
   GET_GROUPS_ERROR,
   ADD_EXPENSE,
   ADD_EXPENSE_ERROR,
-  GET_DASHBOARD,
-  DASHBOARD_ERROR,
   SETTLE_EXPENSE,
   SETTLE_EXPENSE_ERROR,
 } from './types';
@@ -24,29 +22,6 @@ export const getAcceptedGroups = () => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: GET_GROUPS_ERROR,
-      payload: {
-        msg: error.response.statusText,
-        status: error.response.status,
-      },
-    });
-  }
-};
-
-// get dashboard Summary
-export const getDashBoardSummary = () => async (dispatch) => {
-  try {
-    const res = await axios.get('api/dashboard');
-    dispatch({
-      type: GET_DASHBOARD,
-      payload: res.data,
-    });
-  } catch (error) {
-    const { errors } = error.response.data;
-    if (errors) {
-      errors.forEach((err) => dispatch(setAlert(err.msg, 'danger')));
-    }
-    dispatch({
-      type: DASHBOARD_ERROR,
       payload: {
         msg: error.response.statusText,
         status: error.response.status,

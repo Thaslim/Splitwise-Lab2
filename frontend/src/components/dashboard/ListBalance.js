@@ -29,7 +29,8 @@ const ListBalance = ({
         {name}
         <span className={cls} style={{ paddingLeft: '2%', display: 'inline' }}>
           {txt}
-          {csymbol} {amount}
+          {csymbol}
+          {amount}
         </span>
       </strong>
       {groupNames[name].map((el) => {
@@ -43,7 +44,8 @@ const ListBalance = ({
               <>
                 {name} {txt} &nbsp;
                 <span className={cls} style={{ display: 'inline' }}>
-                  {csymbol} {el.amount}
+                  {csymbol}
+                  {el.amount}
                 </span>
                 &nbsp; for "{el.groupName}"
               </>
@@ -52,7 +54,8 @@ const ListBalance = ({
               <>
                 {txt} {name} &nbsp;
                 <span className={cls} style={{ display: 'inline' }}>
-                  {csymbol} {el.amount}
+                  {csymbol}
+                  {el.amount}
                 </span>
                 &nbsp; for "{el.groupName}"
               </>

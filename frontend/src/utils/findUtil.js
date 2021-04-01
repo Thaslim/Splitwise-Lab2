@@ -7,7 +7,7 @@ export const findInArray = (arrObj, email) => {
 };
 
 export const findbyID = (arrObj, id) => {
-  const found = arrObj.filter((ele) => ele.groupID === Number(id));
+  const found = arrObj.filter((ele) => String(ele._id) === String(id));
   return found;
 };
 

@@ -58,10 +58,8 @@ const ListExpenses = ({
         className='cost'
         style={{
           color: '#aaa',
-          padding: '11px 10px 12px 5px',
+          padding: '11px 10px 12px 50px',
           overflow: 'hidden',
-          whiteSpace: 'nowrap',
-          width: '100px',
           float: 'left',
           clear: 'none',
         }}
@@ -82,10 +80,8 @@ const ListExpenses = ({
         className='you'
         style={{
           color: '#aaa',
-          padding: '11px 10px 12px 5px',
+          padding: '11px 10px 12px 50px',
           overflow: 'hidden',
-          whiteSpace: 'nowrap',
-          width: '100px',
         }}
       >
         &nbsp;

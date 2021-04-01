@@ -18,13 +18,15 @@ import SettleUp from '../expenses/SettleUp';
 import ListExpenses from './ListExpenses';
 import { roundToTwo } from '../../utils/calc';
 import GroupBalanceList from './GroupBalanceList';
+import { getAcceptedGroups } from '../../actions/dashboard';
+import { loadUser } from '../../actions/auth';
 
 const Groups = ({
-  group: { groupActivity },
-  dashboard: { acceptedGroups },
+  group: { groupActivity, groups },
   match,
   user,
   getGroupActivity,
+  getAcceptedGroups,
   isAuthenticated,
 }) => {
   const [billPopUp, setBillPopUp] = useState(false);
@@ -33,52 +35,36 @@ const Groups = ({
   const [oweNames, setOweNames] = useState([]);
   const [groupName, setGroupName] = useState('');
   const [groupImg, setGroupImg] = useState('');
+  const [memCount, setMemCount] = useState();
+  const [groupBalances, setGroupBalances] = useState([]);
   const history = useHistory();
   useEffect(() => {
-    if (isAuthenticated && user) {
-      setCSymbol(getSymbolFromCurrency(user[0].userCurrency));
-
-      if (!acceptedGroups) history.push('/dashboard');
-
+    if (!groups) history.push('/dashboard');
+    if (user) {
+      setCSymbol(getSymbolFromCurrency(user.userCurrency));
       getGroupActivity(match.params.id);
     }
 
-    if (acceptedGroups && acceptedGroups.mygroupList.groups.length > 0) {
-      const groupInfo = findbyID(
-        acceptedGroups.mygroupList.groups,
-        match.params.id
-      );
+    if (groups && groups.mygroupList.groups.length) {
+      const groupInfo = findbyID(groups.mygroupList.groups, match.params.id);
       setGroupImg(
         groupInfo[0].groupPicture
-          ? `/static/uploaded_images/groups/${groupInfo[0].groupPicture}`
+          ? `http://localhost:3000/api/images/${groupInfo[0].groupPicture}`
           : profilePic
       );
       setGroupName(groupInfo[0].groupName);
+      setMemCount(groupInfo[0].members.length);
+      setGroupBalances(groupInfo[0].members);
     }
-
-    // if (summary) {
-    //   // eslint-disable-next-line no-unused-vars
-    //   const owes = summary.summary.map((val) => {
-    //     if (Object.values(val)[0] < 0) {
-    //       const memName = findInArray(
-    //         acceptedGroups.acceptedMembers,
-    //         Object.keys(val)[0]
-    //       );
-    //       setOweNames((oweNames) => [
-    //         ...oweNames,
-    //         {
-    //           name: memName.memberName,
-    //           bal: Object.values(val)[0],
-    //           pic: memName.userPicture,
-    //           email: memName.memberEmail,
-    //         },
-    //       ]);
-    //       return Object.values(val)[0];
-    //     }
-    //     return 0;
-    //   });
-    // }
-  }, [getGroupActivity, match, acceptedGroups, isAuthenticated, user, history]);
+  }, [
+    getGroupActivity,
+    match,
+    groups,
+    isAuthenticated,
+    user,
+    getAcceptedGroups,
+    history,
+  ]);
   return groupActivity === null ? (
     <Spinner />
   ) : (
@@ -129,7 +115,7 @@ const Groups = ({
             </div>
           </div>
           <ul>
-            {!groupActivity.groups.length && (
+            {!groupActivity.groupExpense.expenses.length && (
               <>
                 <div
                   style={{
@@ -143,28 +129,30 @@ const Groups = ({
               </>
             )}
             {user &&
-              groupActivity.groups &&
-              sortArray(groupActivity.groups).map((ele) => {
+              groupActivity.groupExpense &&
+              sortArray(groupActivity.groupExpense.expenses).map((ele) => {
                 let paid;
                 let lent;
                 let cls;
+                let lentAmount;
 
                 const paidAmount = ele.amount;
-                const lentAmount = roundToTwo(
-                  (paidAmount / groupActivity.memCount) *
-                    (groupActivity.memCount - 1)
-                );
-                if (ele.paidByEmail === user[0].userEmail) {
+
+                if (ele.paidByEmail === user.userEmail) {
                   paid = 'you paid';
                   lent = 'you lent';
                   cls = 'positive';
+                  lentAmount = roundToTwo(
+                    (paidAmount / memCount) * (memCount - 1)
+                  );
                 } else {
                   paid = `${ele.paidByEmail.slice(0, 5)} paid`;
                   lent = `${ele.paidByEmail.slice(0, 5)} lent you`;
                   cls = 'negative';
+                  lentAmount = roundToTwo(paidAmount / memCount);
                 }
                 return (
-                  <li key={ele.idExpenses}>
+                  <li key={ele._id}>
                     <ListExpenses
                       description={ele.description}
                       paidAmount={paidAmount}
@@ -184,22 +172,22 @@ const Groups = ({
               <AddBillPopUp
                 billPopUp={billPopUp}
                 setBillPopUp={setBillPopUp}
-                mygroups={acceptedGroups && acceptedGroups.mygroupList}
+                mygroups={groups && groups.mygroupList.groups}
                 currency={cSymbol}
               />
             </>
           )}
-          {settleUp && (
+          {/* {settleUp && (
             <>
               <SettleUp
                 settleUp={settleUp}
                 setSettleUp={setSettleUp}
-                mygroups={acceptedGroups && acceptedGroups.mygroupList}
+                mygroups={groups && groups.mygroupList.groups}
                 currency={cSymbol}
                 oweNames={oweNames}
               />
             </>
-          )}
+          )} */}
         </div>
       </div>
 
@@ -213,32 +201,34 @@ const Groups = ({
       >
         <h2 style={{ paddingBottom: '5%' }}>Group balances</h2>
         <ul>
-          {groupActivity &&
-            groupActivity.groupMemberBalance.map((ele) => {
+          {groupBalances &&
+            groupBalances.map((ele) => {
               let cls;
               let txt;
-              if (ele.total > 0) {
+              let amount;
+              if (ele.give) {
                 cls = 'negative';
                 txt = 'owes';
-              } else if (ele.total < 0) {
+                amount = ele.give;
+              }
+              if (ele.getBack) {
                 cls = 'positive';
                 txt = 'gets back';
-              } else {
+                amount = ele.getBack;
+              }
+              if (!ele.getBack && !ele.give) {
                 cls = 'neutral';
                 txt = 'settled up';
               }
-              const picture =
-                acceptedGroups &&
-                findInArray(acceptedGroups.acceptedMembers, ele.memberEmail);
 
               return (
-                <li key={ele.idGroupMembers}>
+                <li key={ele.memberID._id}>
                   <GroupBalanceList
-                    imgSrc={picture}
+                    imgSrc={ele.memberID}
                     cls={cls}
-                    amount={Math.abs(ele.total)}
+                    amount={amount}
                     csymbol={cSymbol}
-                    email={ele.memberEmail}
+                    email={ele.memberID.userName}
                     txt={txt}
                   />
                 </li>
@@ -251,11 +241,11 @@ const Groups = ({
 };
 
 Groups.propTypes = {
-  user: PropTypes.array,
+  user: PropTypes.object,
   isAuthenticated: PropTypes.bool,
   getGroupActivity: PropTypes.func.isRequired,
-  dashboard: PropTypes.object.isRequired,
   group: PropTypes.object.isRequired,
+  getAcceptedGroups: PropTypes.func.isRequired,
 };
 
 Groups.defaultProps = {
@@ -264,10 +254,10 @@ Groups.defaultProps = {
 };
 const mapStateToProps = (state) => ({
   user: state.auth.user,
-  dashboard: state.dashboard,
   group: state.group,
   isAuthenticated: state.auth.isAuthenticated,
 });
 export default connect(mapStateToProps, {
   getGroupActivity,
+  getAcceptedGroups,
 })(Groups);

@@ -5,23 +5,19 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import path from 'path';
 import { connect } from 'react-redux';
-
 import PropTypes from 'prop-types';
 import Spinner from '../landingPage/Spinner';
 import splitwiselogo from '../landingPage/splitwise.svg';
 import { editGroupInfo } from '../../actions/group';
 import profilePic from '../user/profile-pic.png';
-
-// import { getAcceptedGroups } from '../../actions/dashboard';
 import { findbyID } from '../../utils/findUtil';
 import { getAcceptedGroups } from '../../actions/dashboard';
 
 const EditGroup = ({
   match,
   getAcceptedGroups,
-  dashboard: { groups, loading },
+  group: { groups, loading },
   editGroupInfo,
 }) => {
   const history = useHistory();
@@ -37,22 +33,24 @@ const EditGroup = ({
       setGroupName(!groupDetails[0].groupName ? '' : groupDetails[0].groupName);
 
       if (groupDetails[0].groupPicture) {
-        setFilePath(`api/images/${groupDetails[0].groupPicture}`);
+        setFilePath(
+          `http://localhost:3000/api/images/${groupDetails[0].groupPicture}`
+        );
       }
-      const MemInfo = findbyID(groups.individualGroupMembers, match.params.id);
-      setGroupMemInfo(...groupMemInfo, MemInfo);
+      setGroupMemInfo(groupDetails[0].members);
     }
-  }, [getAcceptedGroups, acceptedGroups, loading, match, groupMemInfo]);
+  }, [getAcceptedGroups, loading, match, groups]);
 
   const onSaveChanges = async (e) => {
     e.preventDefault();
     const groupData = new FormData();
+    groupData.append('groupID', match.params.id);
     groupData.append('groupName', groupName);
     groupData.append('selectedFile', selectedFile);
-    editGroupInfo(match.params.id, groupData, history);
+    editGroupInfo(groupData, history);
   };
 
-  return loading && acceptedGroups === null ? (
+  return loading || !groups ? (
     <Spinner />
   ) : (
     <div className='container-fluid'>
@@ -104,20 +102,21 @@ const EditGroup = ({
               <br />
               <div className='groupMembers'>
                 <ul>
-                  {groupMemInfo.length > 0 &&
-                    groupMemInfo[0].details.map((mem) => (
-                      <li key={mem.memberEmail}>
+                  {groupMemInfo.length &&
+                    groupMemInfo.map((mem) => (
+                      <li key={mem.memberID._id}>
                         <p>
                           <img
                             src={
-                              (mem.userPicture &&
-                                `api/images/${mem.userPicture}`) ||
+                              (mem.memberID.userPicture &&
+                                `http://localhost:3000/api/images/${mem.memberID.userPicture}`) ||
                               profilePic
                             }
                             alt='profilePic'
                           />
                           &emsp;
-                          {mem.memberName} (<em>{mem.memberEmail}</em>)
+                          {mem.memberID.userName} (
+                          <em>{mem.memberID.userEmail}</em>)
                         </p>
                       </li>
                     ))}
@@ -148,13 +147,13 @@ const EditGroup = ({
 
 EditGroup.propTypes = {
   editGroupInfo: PropTypes.func.isRequired,
-  dashboard: PropTypes.object.isRequired,
+  group: PropTypes.object.isRequired,
   getAcceptedGroups: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   user: state.auth.user,
-  dashboard: state.dashboard,
+  group: state.group,
 });
 export default connect(mapStateToProps, { editGroupInfo, getAcceptedGroups })(
   EditGroup

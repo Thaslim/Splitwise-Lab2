@@ -4,7 +4,6 @@
 /* eslint-disable consistent-return */
 import express from 'express';
 import phone from 'phone';
-import path from 'path';
 import validator from 'express-validator';
 import passport from 'passport';
 import multer from 'multer';
@@ -17,16 +16,6 @@ dotenv.config({ path: './config/.env' });
 const { check, validationResult } = validator;
 const router = express.Router();
 export default router;
-
-const dirname = path.resolve(path.dirname(''));
-const destPath = `${dirname}/public/uploaded_images/users`;
-
-// const storage = multer.diskStorage({
-//   destination: destPath,
-//   filename: (req, file, cb) => {
-//     cb(null, `user ${file.originalname}`);
-//   },
-// });
 
 const S3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY,

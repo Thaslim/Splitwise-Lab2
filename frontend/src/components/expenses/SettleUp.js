@@ -15,7 +15,7 @@ import {
   FormControl,
   DialogContentText,
 } from '@material-ui/core';
-import { settleExpense } from '../../actions/dashboard';
+import { settleExpense } from '../../actions/group';
 
 const useStyles = makeStyles((theme) => ({
   root: {

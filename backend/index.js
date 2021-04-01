@@ -14,8 +14,8 @@ import profileRouter from './routes/api/users/profile.js';
 import createGroupRouter from './routes/api/groups/new-group.js';
 import mygroupsRouter from './routes/api/groups/my-groups.js';
 import groupsRouter from './routes/api/groups/groups.js';
-// import dashboardRouter from './routes/api/dashboard/dashboard.js';
 import imageRetrieve from './routes/api/aws-s3/retrieve-file.js';
+import settleRouter from './routes/api/groups/settleUp.js';
 
 dotenv.config({ path: './config/.env' });
 
@@ -27,7 +27,7 @@ app.use(passport.initialize());
 
 // eslint-disable-next-line no-unused-vars
 const passportJwt = ps(passport);
-// import { router as settleRouter } from './routes/api/groups/settleUp.js';
+
 // import { router as activityRouter } from './routes/api/groups/activity.js';
 
 app.get('/', (req, res) => {
@@ -43,9 +43,8 @@ app.use('/api/me', profileRouter);
 app.use('/api/new-group', createGroupRouter);
 app.use('/api/my-groups', mygroupsRouter);
 app.use('/api/groups', groupsRouter);
-// app.use('/api/dashboard', dashboardRouter);
 app.use('/api/images', imageRetrieve);
-// app.use('/api/settle', settleRouter);
+app.use('/api/settle', settleRouter);
 // app.use('/api/activity', activityRouter);
 
 const port = process.env.PORT || 8000;

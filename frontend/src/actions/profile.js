@@ -1,8 +1,7 @@
 import axios from 'axios';
 import setAlert from './alert';
 import { loadUser } from './auth';
-import { getAcceptedGroups } from './dashboard';
-
+import { getAcceptedGroups } from './group';
 import { UPDATE_PROFILE, UPDATE_PROFILE_ERROR } from './types';
 
 // Update Profile

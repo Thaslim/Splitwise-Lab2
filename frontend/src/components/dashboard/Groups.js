@@ -4,7 +4,7 @@ import { NavLink, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import AddBillPopUp from '../expenses/AddBillPopUp';
-import { getGroupActivity } from '../../actions/group';
+import { getGroupActivity, getAcceptedGroups } from '../../actions/group';
 import { findbyID, sortArray } from '../../utils/findUtil';
 import Spinner from '../landingPage/Spinner';
 import profilePic from '../user/profile-pic.png';
@@ -12,7 +12,6 @@ import SettleUp from '../expenses/SettleUp';
 import ListExpenses from './ListExpenses';
 import { roundToTwo } from '../../utils/calc';
 import GroupBalanceList from './GroupBalanceList';
-import { getAcceptedGroups } from '../../actions/dashboard';
 
 const Groups = ({
   group: { groupActivity, groups },

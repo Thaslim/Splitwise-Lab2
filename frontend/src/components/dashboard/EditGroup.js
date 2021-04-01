@@ -4,10 +4,9 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Spinner from '../landingPage/Spinner';
 import splitwiselogo from '../landingPage/splitwise.svg';
-import { editGroupInfo } from '../../actions/group';
+import { editGroupInfo, getAcceptedGroups } from '../../actions/group';
 import profilePic from '../user/profile-pic.png';
 import { findbyID } from '../../utils/findUtil';
-import { getAcceptedGroups } from '../../actions/dashboard';
 
 const EditGroup = ({
   match,

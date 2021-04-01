@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import AddBillPopUp from '../expenses/AddBillPopUp';
-import { getAcceptedGroups } from '../../actions/dashboard';
+import { getAcceptedGroups } from '../../actions/group';
 import { roundToTwo } from '../../utils/calc';
 import ListBalance from './ListBalance';
 import Spinner from '../landingPage/Spinner';
@@ -35,8 +35,6 @@ const Dashboard = ({
     }
 
     if ((user && !groups) || groupInfo === 'Updated') {
-      console.log('Herwe');
-
       getAcceptedGroups();
     }
     if (user && groups && groups.mygroupList.iOwe.length) {

@@ -16,7 +16,7 @@ import {
 } from '@material-ui/core';
 import CurrencyTextField from '@unicef/material-ui-currency-textfield';
 import PropTypes from 'prop-types';
-import { addExpense } from '../../actions/dashboard';
+import { addExpense } from '../../actions/group';
 
 const useStyles = makeStyles((theme) => ({
   root: {

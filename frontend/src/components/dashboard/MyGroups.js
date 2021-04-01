@@ -3,8 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import SearchBar from 'material-ui-search-bar';
-import { acceptGroupInvitation, leaveGroup } from '../../actions/group';
-import { getAcceptedGroups } from '../../actions/dashboard';
+import {
+  acceptGroupInvitation,
+  leaveGroup,
+  getAcceptedGroups,
+} from '../../actions/group';
 import { findbyName } from '../../utils/findUtil';
 import profilePic from '../user/profile-pic.png';
 

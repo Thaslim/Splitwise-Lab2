@@ -1,7 +1,7 @@
 import axios from 'axios';
 import setToken from '../utils/setToken';
 import setAlert from './alert';
-import { getAcceptedGroups } from './dashboard';
+import { getAcceptedGroups } from './group';
 import {
   REGISTER_SUCCESS,
   REGISTER_FAIL,

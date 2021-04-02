@@ -41,8 +41,7 @@ router.get(
 // @desc Add expense
 // @access Private
 
-export const roundToTwo = (num) =>
-  Math.round((num + Number.EPSILON) * 100) / 100;
+const roundToTwo = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
 
 router.post(
   '/',
@@ -144,6 +143,7 @@ router.post(
             action: `added ${getSymbolFromCurrency(
               req.user.userCurrency
             )}${amount} to ${groupInfo.groupName} group`,
+            userSpecific: false,
           },
         },
       });

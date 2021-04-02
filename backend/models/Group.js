@@ -16,6 +16,7 @@ const ActivitySchema = new mongoose.Schema({
     ref: 'user',
   },
   action: { type: String, required: true },
+  userSpecific: { type: Boolean, required: true },
 });
 const GroupSchema = new mongoose.Schema({
   groupName: {

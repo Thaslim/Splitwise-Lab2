@@ -127,7 +127,8 @@ router.post(
       group.members.push({ memberID: req.user.id });
       group.activity.push({
         actionBy: req.user.id,
-        action: `created ${groupName} group`,
+        action: `You created ${groupName} group`,
+        userSpecific: true,
       });
       group.save();
       let ids = [];

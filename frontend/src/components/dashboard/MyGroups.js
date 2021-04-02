@@ -154,7 +154,7 @@ MyGroups.defaultProps = {
 };
 const mapStateToProps = (state) => ({
   user: state.auth.user,
-  group: state.dashboard,
+  group: state.group,
   isAuthenticated: state.auth.isAuthenticated,
 });
 export default connect(mapStateToProps, {

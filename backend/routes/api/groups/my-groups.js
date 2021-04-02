@@ -61,12 +61,18 @@ router.post(
     const { groupID, groupName } = req.body;
 
     try {
+      const createdBy = await Group.findById(groupID, {
+        createdBy: 1,
+        _id: 0,
+      }).populate({ path: 'createdBy', select: ['userName'] });
+
       await Group.findByIdAndUpdate(groupID, {
         $addToSet: { members: { memberID: req.user.id } },
         $push: {
           activity: {
             actionBy: req.user.id,
-            action: `${req.user.userName} accepted invitation to join ${groupName} group`,
+            action: `${createdBy.createdBy.userName} added you to the group "${groupName}"`,
+            userSpecific: true,
           },
         },
       });
@@ -265,6 +271,18 @@ router.post(
       await Group.findByIdAndUpdate(groupID, {
         $set: GroupFields,
       });
+
+      if (groupPicture) {
+        await Group.findByIdAndUpdate(groupID, {
+          $push: {
+            activity: {
+              actionBy: req.user.id,
+              action: `updated cover photo for "${groupName}"`,
+              userSpecific: false,
+            },
+          },
+        });
+      }
 
       return res.json('Updated');
     } catch (error) {

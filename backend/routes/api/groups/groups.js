@@ -6,6 +6,8 @@ import getSymbolFromCurrency from 'currency-symbol-map';
 import Group from '../../../models/Group.js';
 import Expense from '../../../models/Expense.js';
 import User from '../../../models/User.js';
+import Activity from '../../../models/Activity.js';
+import GroupMembers from '../../../models/GroupMembers.js';
 
 const { check, validationResult } = validator;
 
@@ -37,7 +39,33 @@ router.get(
   }
 );
 
-// @route POST api/groups/:group_id
+// @route GET api/groups/:group_id
+// @desc Get group balance
+// @access Private
+router.get(
+  '/group-balance/:id',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      const members = await GroupMembers.find(
+        { groupID: req.params.id },
+        { _id: 0 }
+      ).populate({
+        path: 'memberID',
+        select: ['userName'],
+      });
+
+      res.json({
+        members,
+      });
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send('Server error');
+    }
+  }
+);
+
+// @route POST api/groups/
 // @desc Add expense
 // @access Private
 
@@ -71,64 +99,59 @@ router.post(
         date,
       });
       expense.save();
-      const groupInfo = await Group.findById(groupID, {
-        members: 1,
-        groupName: 1,
-        _id: 0,
-      });
-      groupInfo.members.map(async (mem) => {
-        let bal;
-        const prevGet = mem.getBack;
-        const prevGive = mem.give;
 
-        if (String(mem.memberID) === String(req.user.id)) {
-          bal = roundToTwo(
-            amount - roundToTwo(amount / groupInfo.members.length)
-          );
+      const getGroupMembers = await GroupMembers.find({ groupID });
 
-          await Group.findOneAndUpdate(
-            {
-              _id: groupID,
-              members: { $elemMatch: { memberID: mem.memberID } },
-            },
-            { $set: { 'members.$.getBack': roundToTwo(prevGet + bal) } }
-          );
-        } else {
-          bal = roundToTwo(amount / groupInfo.members.length);
-
-          await Group.findOneAndUpdate(
-            {
-              _id: groupID,
-              members: { $elemMatch: { memberID: mem.memberID } },
-            },
-            { $set: { 'members.$.give': roundToTwo(prevGive + bal) } }
-          );
-        }
-      });
-
-      const membersExceptMe = groupInfo.members.filter(
+      const membersExceptMe = getGroupMembers.filter(
         (mem) => String(mem.memberID) !== String(req.user.id)
       );
 
+      const mybal = roundToTwo(
+        amount - roundToTwo(amount / getGroupMembers.length)
+      );
+      const othersBal = roundToTwo(amount / getGroupMembers.length);
+
+      const groupMemberIdsExceptMe = membersExceptMe.map((mem) => mem._id);
+
+      // Update give balance
+      await GroupMembers.updateMany(
+        { _id: { $in: groupMemberIdsExceptMe } },
+        {
+          $inc: { give: othersBal },
+        }
+      );
+
+      //Update Getback
+      await GroupMembers.findOneAndUpdate(
+        { groupID, memberID: req.user.id },
+        {
+          $inc: { getBack: mybal },
+        }
+      );
+
       const membersExceptMeIds = membersExceptMe.map((mem) => mem.memberID);
+
+      // Update owed to me for current user
       membersExceptMe.map(async (mem) => {
         await User.findByIdAndUpdate(req.user.id, {
           $addToSet: {
             owedToMe: {
               memberID: mem.memberID,
-              amount: roundToTwo(amount / groupInfo.members.length),
+              amount: roundToTwo(amount / getGroupMembers.length),
               groupID,
             },
           },
         });
       });
+
+      // Update IOwe for other members
       await User.updateMany(
         { _id: { $in: membersExceptMeIds } },
         {
           $addToSet: {
             iOwe: {
               memberID: req.user.id,
-              amount: roundToTwo(amount / groupInfo.members.length),
+              amount: roundToTwo(amount / getGroupMembers.length),
               groupID,
             },
           },
@@ -138,15 +161,19 @@ router.post(
       await Group.findByIdAndUpdate(groupID, {
         $push: {
           expenses: expense._id,
-          activity: {
-            actionBy: req.user.id,
-            action: `added ${getSymbolFromCurrency(
-              req.user.userCurrency
-            )}${amount} to ${groupInfo.groupName} group`,
-            userSpecific: false,
-          },
         },
       });
+
+      const groupInfo = await Group.findById(groupID, {
+        groupName: 1,
+        _id: 0,
+      });
+      const activity = new Activity({ groupID, actionBy: req.user.id });
+      activity.action = `added ${getSymbolFromCurrency(
+        req.user.userCurrency
+      )}${amount} to "${groupInfo.groupName}" group`;
+      activity.save();
+
       res.send('Expense Added');
     } catch (error) {
       console.error(error);

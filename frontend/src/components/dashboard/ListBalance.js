@@ -26,7 +26,7 @@ const ListBalance = ({
         &emsp;
         {name}
         <span className={cls} style={{ paddingLeft: '2%', display: 'inline' }}>
-          {txt}
+          {txt} &nbsp;
           {csymbol}
           {amount}
         </span>

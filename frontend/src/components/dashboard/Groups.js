@@ -4,7 +4,11 @@ import { NavLink, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import AddBillPopUp from '../expenses/AddBillPopUp';
-import { getGroupActivity, getAcceptedGroups } from '../../actions/group';
+import {
+  getGroupActivity,
+  getAcceptedGroups,
+  getGroupBalances,
+} from '../../actions/group';
 import { findbyID, sortArray } from '../../utils/findUtil';
 import Spinner from '../landingPage/Spinner';
 import profilePic from '../user/profile-pic.png';
@@ -14,27 +18,26 @@ import { roundToTwo } from '../../utils/calc';
 import GroupBalanceList from './GroupBalanceList';
 
 const Groups = ({
-  group: { groupActivity, groups },
+  group: { groupActivity, groups, groupBalance },
   match,
   user,
   getGroupActivity,
+  getGroupBalances,
   getAcceptedGroups,
   isAuthenticated,
 }) => {
   const [billPopUp, setBillPopUp] = useState(false);
   const [settleUp, setSettleUp] = useState(false);
   const [cSymbol, setCSymbol] = useState('');
-
   const [groupName, setGroupName] = useState('');
   const [groupImg, setGroupImg] = useState('');
-  const [memCount, setMemCount] = useState();
-  const [groupBalances, setGroupBalances] = useState([]);
   const history = useHistory();
   useEffect(() => {
     if (!groups) history.push('/dashboard');
     if (user) {
       setCSymbol(getSymbolFromCurrency(user.userCurrency));
       getGroupActivity(match.params.id);
+      getGroupBalances(match.params.id);
     }
 
     if (groups && groups.mygroupList.groups.length) {
@@ -45,11 +48,10 @@ const Groups = ({
           : profilePic
       );
       setGroupName(groupInfo[0].groupName);
-      setMemCount(groupInfo[0].members.length);
-      setGroupBalances(groupInfo[0].members);
     }
   }, [
     getGroupActivity,
+    getGroupBalances,
     match,
     groups,
     isAuthenticated,
@@ -57,7 +59,7 @@ const Groups = ({
     getAcceptedGroups,
     history,
   ]);
-  return groupActivity === null ? (
+  return groupActivity === null || groupBalance === null ? (
     <Spinner />
   ) : (
     <div>
@@ -135,13 +137,16 @@ const Groups = ({
                   lent = 'you lent';
                   cls = 'positive';
                   lentAmount = roundToTwo(
-                    (paidAmount / memCount) * (memCount - 1)
+                    (paidAmount / groupBalance.members.length) *
+                      (groupBalance.members.length - 1)
                   );
                 } else {
-                  paid = `${ele.paidByEmail.slice(0, 5)} paid`;
-                  lent = `${ele.paidByEmail.slice(0, 5)} lent you`;
+                  paid = `${ele.paidByName.slice(0, 5)} paid`;
+                  lent = `${ele.paidByName.slice(0, 5)} lent you`;
                   cls = 'negative';
-                  lentAmount = roundToTwo(paidAmount / memCount);
+                  lentAmount = roundToTwo(
+                    paidAmount / groupBalance.members.length
+                  );
                 }
                 return (
                   <li key={ele._id}>
@@ -193,8 +198,8 @@ const Groups = ({
       >
         <h2 style={{ paddingBottom: '5%' }}>Group balances</h2>
         <ul>
-          {groupBalances &&
-            groupBalances.map((ele) => {
+          {groupBalance.members &&
+            groupBalance.members.map((ele) => {
               let cls;
               let txt;
               let amount;
@@ -252,4 +257,5 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps, {
   getGroupActivity,
   getAcceptedGroups,
+  getGroupBalances,
 })(Groups);

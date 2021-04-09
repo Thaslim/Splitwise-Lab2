@@ -23,6 +23,9 @@ import {
   ADD_EXPENSE,
   SETTLE_EXPENSE,
   SETTLE_EXPENSE_ERROR,
+  GET_GROUP_BALANCE,
+  GET_GROUP_BALANCE_ERROR,
+  CLEAR_GROUP_BALANCE,
 } from '../actions/types';
 
 const initialState = {
@@ -33,7 +36,7 @@ const initialState = {
   groupInfo: '',
   invitation: '',
   recentactivity: null,
-
+  groupBalance: null,
   groups: null,
   loading: true,
   expenseAdded: false,
@@ -56,6 +59,7 @@ function groupReducer(state = initialState, action) {
     case ACCEPT_INVITATION_ERROR:
     case GET_RECENT_ACTIVITY_ERROR:
     case LEAVE_GROUP_ERROR:
+    case GET_GROUP_BALANCE_ERROR:
       return {
         ...state,
         error: payload,
@@ -148,6 +152,18 @@ function groupReducer(state = initialState, action) {
         ...state,
         error: payload,
         expenseSettled: true,
+      };
+
+    case GET_GROUP_BALANCE:
+      return {
+        ...state,
+        groupBalance: payload,
+      };
+
+    case CLEAR_GROUP_BALANCE:
+      return {
+        ...state,
+        groupBalance: null,
       };
 
     default:

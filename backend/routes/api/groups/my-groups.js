@@ -5,6 +5,8 @@ import validator from 'express-validator';
 import passport from 'passport';
 import User from '../../../models/User.js';
 import Group from '../../../models/Group.js';
+import GroupMembers from '../../../models/GroupMembers.js';
+import Activity from '../../../models/Activity.js';
 import uuid from 'uuid';
 
 const { check, validationResult } = validator;
@@ -66,16 +68,12 @@ router.post(
         _id: 0,
       }).populate({ path: 'createdBy', select: ['userName'] });
 
-      await Group.findByIdAndUpdate(groupID, {
-        $addToSet: { members: { memberID: req.user.id } },
-        $push: {
-          activity: {
-            actionBy: req.user.id,
-            action: `${createdBy.createdBy.userName} added you to the group "${groupName}"`,
-            userSpecific: true,
-          },
-        },
-      });
+      const member = new GroupMembers({ groupID, memberID: req.user.id });
+      member.save();
+
+      const activity = new Activity({ actionBy: req.user.id, groupID });
+      activity.action = `${createdBy.createdBy.userName} added you to the group "${groupName}"`;
+      activity.save();
 
       await User.findByIdAndUpdate(req.user.id, {
         $addToSet: { groups: groupID },
@@ -160,13 +158,12 @@ router.get(
       })
         .populate({
           path: 'groups',
-          select: ['groupName', 'groupPicture', 'members'],
-          populate: {
-            path: 'members.memberID',
-            select: ['userName', 'userEmail', 'userPicture'],
-          },
+          select: ['groupName', 'groupPicture'],
         })
-        .populate({ path: 'invites', select: ['groupName', 'groupPicture'] })
+        .populate({
+          path: 'invites',
+          select: ['groupName', 'groupPicture'],
+        })
         .populate({
           path: 'iOwe.memberID',
           select: ['userName', 'userEmail', 'userPicture'],
@@ -272,17 +269,17 @@ router.post(
         $set: GroupFields,
       });
 
-      if (groupPicture) {
-        await Group.findByIdAndUpdate(groupID, {
-          $push: {
-            activity: {
-              actionBy: req.user.id,
-              action: `updated cover photo for "${groupName}"`,
-              userSpecific: false,
-            },
-          },
-        });
-      }
+      // if (groupPicture) {
+      //   await Group.findByIdAndUpdate(groupID, {
+      //     $push: {
+      //       activity: {
+      //         actionBy: req.user.id,
+      //         action: `updated cover photo for "${groupName}"`,
+      //         userSpecific: false,
+      //       },
+      //     },
+      //   });
+      // }
 
       return res.json('Updated');
     } catch (error) {

@@ -48,6 +48,9 @@ const Dashboard = ({
         .value();
       setOweNames(uniqueIoweMembers);
 
+      const iOweAmount = _.sumBy(groups.mygroupList.iOwe, 'amount');
+      setOwe(iOweAmount);
+
       const memBalanceEachGroup = getIndividualGroupBalance(
         groups.mygroupList.iOwe
       );
@@ -63,33 +66,30 @@ const Dashboard = ({
           memberPic: obj[0].memberID.userPicture || '',
         }))
         .value();
+
       setgetBackNames(uniqueOweToMeMembers);
+
+      const getBackAmount = _.sumBy(groups.mygroupList.owedToMe, 'amount');
+
+      setGetBack(getBackAmount);
+
       const memBalanceEachGroup = getIndividualGroupBalance(
         groups.mygroupList.owedToMe
       );
       setGetBackFromGroupNames(memBalanceEachGroup);
     }
 
-    if (user && groups && groups.mygroupList.groups.length) {
-      const allMembers = groups.mygroupList.groups.map((el) => el.members);
-      const mergedAccMembers = allMembers.flat(1);
-      const uniqueMembers = _(mergedAccMembers)
-        .groupBy('memberID._id')
-        .map((obj, key) => ({
-          memberID: key,
-          getBack: roundToTwo(_.sumBy(obj, 'getBack')),
-          give: roundToTwo(_.sumBy(obj, 'give')),
-        }))
-        .value();
-
-      const myBalance = uniqueMembers.filter(
-        (mem) => mem.memberID === user._id
-      );
-      setGetBack(myBalance[0].getBack);
-      setOwe(myBalance[0].give);
-      setTotalBalance(roundToTwo(myBalance[0].getBack - myBalance[0].give));
-    }
-  }, [getAcceptedGroups, isAuthenticated, user, loading, groups, groupInfo]);
+    setTotalBalance(roundToTwo(getBack - owe));
+  }, [
+    getAcceptedGroups,
+    isAuthenticated,
+    user,
+    loading,
+    groups,
+    groupInfo,
+    getBack,
+    owe,
+  ]);
 
   return loading || !groups ? (
     <Spinner />

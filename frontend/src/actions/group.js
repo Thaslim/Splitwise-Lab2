@@ -22,6 +22,8 @@ import {
   ADD_EXPENSE_ERROR,
   SETTLE_EXPENSE,
   SETTLE_EXPENSE_ERROR,
+  GET_GROUP_BALANCE,
+  GET_GROUP_BALANCE_ERROR,
 } from './types';
 
 // Get registered user list
@@ -173,6 +175,29 @@ export const getGroupActivity = (groupID) => async (dispatch) => {
     }
     dispatch({
       type: GET_GROUP_ACTIVITY_ERROR,
+      payload: {
+        msg: error.response.statusText,
+        status: error.response.status,
+      },
+    });
+  }
+};
+
+// Get Group Balances
+export const getGroupBalances = (groupID) => async (dispatch) => {
+  try {
+    const res = await axios.get(`/api/groups/group-balance/${groupID}`);
+    dispatch({
+      type: GET_GROUP_BALANCE,
+      payload: res.data,
+    });
+  } catch (error) {
+    const { errors } = error.response.data;
+    if (errors) {
+      errors.forEach((err) => dispatch(setAlert(err.msg, 'danger')));
+    }
+    dispatch({
+      type: GET_GROUP_BALANCE_ERROR,
       payload: {
         msg: error.response.statusText,
         status: error.response.status,

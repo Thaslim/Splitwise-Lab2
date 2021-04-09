@@ -6,6 +6,8 @@ import passport from 'passport';
 import multer from 'multer';
 import User from '../../../models/User.js';
 import Group from '../../../models/Group.js';
+import GroupMembers from '../../../models/GroupMembers.js';
+import Activity from '../../../models/Activity.js';
 
 const { check, validationResult } = validator;
 
@@ -121,16 +123,16 @@ router.post(
       }
 
       group = new Group({ groupName, createdBy: req.user.id });
-      const groupId = group.id;
-
-      if (req.file) group.groupPicture = groupPicture;
-      group.members.push({ memberID: req.user.id });
-      group.activity.push({
-        actionBy: req.user.id,
-        action: `You created ${groupName} group`,
-        userSpecific: true,
-      });
+      const groupID = group.id;
       group.save();
+
+      const groupMembers = new GroupMembers({ groupID, memberID: req.user.id });
+      groupMembers.save();
+
+      const activity = new Activity({ actionBy: req.user.id, groupID });
+      activity.action = `created "${groupName}" group`;
+      activity.save();
+
       let ids = [];
       if (invites) {
         const jsonInvites = JSON.parse(invites);
@@ -146,12 +148,12 @@ router.post(
       }
 
       await User.findByIdAndUpdate(req.user.id, {
-        $push: { groups: groupId },
+        $push: { groups: groupID },
       });
       await User.updateMany(
         { _id: { $in: ids } },
         {
-          $push: { invites: groupId },
+          $push: { invites: groupID },
         }
       );
 

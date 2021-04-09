@@ -7,11 +7,6 @@ import _ from 'lodash';
 
 export default router;
 
-const findInArray = (arrObj, id) => {
-  const found = arrObj.find((element) => element.idExpense === id);
-  return found;
-};
-
 const roundToTwo = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
 
 const updateBalances = async (userID, settleWithID, filter) => {

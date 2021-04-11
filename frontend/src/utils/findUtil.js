@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable object-curly-newline */
 /* eslint-disable comma-dangle */
+import moment from 'moment';
+
 export const findInArray = (arrObj, email) => {
   const found = arrObj.find((element) => element.memberEmail === email);
   return found;
@@ -17,12 +19,15 @@ export const findbyName = (arrObj, name) => {
 };
 
 export const sortArray = (arrObj) => {
-  const sortedArrObj = arrObj.sort(
-    (a, b) => new Date(b.date) - new Date(a.date)
-  );
-  return sortedArrObj;
+  arrObj.sort(sorter);
+  return arrObj;
 };
 
+const sorter = (a, b) => {
+  const dateA = moment(a.date).local().format('YYYY-MM-DD HH:mm:ss');
+  const dateB = moment(b.date).local().format('YYYY-MM-DD HH:mm:ss');
+  return new Date(dateB).getTime() - new Date(dateA).getTime();
+};
 export const getMonthDate = (date) => {
   const monthNames = [
     'Jan',

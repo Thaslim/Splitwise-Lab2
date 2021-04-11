@@ -72,7 +72,7 @@ router.post(
       member.save();
 
       const activity = new Activity({ actionBy: req.user.id, groupID });
-      activity.action = `${createdBy.createdBy.userName} added you to the group "${groupName}"`;
+      activity.action = `${createdBy.createdBy.userName} added ${req.user.userName} to the group "${groupName}"`;
       activity.save();
 
       await User.findByIdAndUpdate(req.user.id, {
@@ -93,53 +93,49 @@ router.post(
 // @route post api/my-groups/leave-group
 // @desc reject group invitation
 // @access Private
-// router.post('/leave-group',
-// passport.authenticate('jwt', { session: false }), async (req, res) => {
-//   const {groupID, groupName} = req.body;
+router.post(
+  '/leave-group',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    const { groupID, groupName } = req.body;
 
-//   try {
-//     const checkBalance = await splitwisedb.getGroupBalances(groupID);
-//     const stringifyBal = JSON.stringify(checkBalance);
-//     const jsonBal = JSON.parse(stringifyBal);
-//     if (jsonBal && jsonBal.length > 0) {
-//       const found = jsonBal.find(
-//         (element) => element.memberEmail === req.user.key
-//       );
-//       if (found && Math.abs(found.total) > 0.5) {
-//         return res.status(400).json({
-//           errors: [
-//             {
-//               msg: `Settle up all the balances before leaving the group`,
-//             },
-//           ],
-//         });
-//       }
-//     }
+    try {
+      const currentUserBalances = await User.findById(req.user.id, {
+        iOwe: 1,
+        owedToMe: 1,
+        _id: 0,
+      });
+      const groups1 = currentUserBal.iOwe.filter((ele) => {
+        return String(ele.groupID) === String(groupID);
+      });
+      const groups2 = currentUserBal.owedToMe.filter((ele) => {
+        return String(ele.groupID) === String(groupID);
+      });
 
-//     const createdBy = await splitwisedb.getCreatedBy(groupID);
+      if (groups1.length || groups2.length) {
+        return res.status(400).json({
+          errors: [
+            {
+              msg: `Settle up all the balances before leaving the group`,
+            },
+          ],
+        });
+      }
 
-//     if (createdBy) {
-//       if (createdBy.createdBy === req.user.id && jsonBal.length > 0) {
-//         return res.status(400).json({
-//           errors: [
-//             {
-//               msg: `Delete the group if balances with other group members are not settled up`,
-//             },
-//           ],
-//         });
-//       }
-//     }
-//     const rejectInvitation = await splitwisedb.rejectInvitation(
-//       groupID,
-//       req.user.key
-//     );
-
-//     return res.json('Rejected Invitation');
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send('Server error');
-//   }
-// });
+      await GroupMembers.deleteOne({ groupID, memberID: req.user.id });
+      const activity = new Activity({
+        actionBy: req.user.userName,
+        action: `${req.user.userName} left from the group ${groupName}`,
+        groupID,
+      });
+      activity.save();
+      res.send('left from group');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    }
+  }
+);
 
 // @route GET api/my-groups/
 // @desc Get current user's groups
@@ -269,17 +265,14 @@ router.post(
         $set: GroupFields,
       });
 
-      // if (groupPicture) {
-      //   await Group.findByIdAndUpdate(groupID, {
-      //     $push: {
-      //       activity: {
-      //         actionBy: req.user.id,
-      //         action: `updated cover photo for "${groupName}"`,
-      //         userSpecific: false,
-      //       },
-      //     },
-      //   });
-      // }
+      if (groupPicture) {
+        const activity = new Activity({
+          actionBy: req.user.id,
+          action: `${req.user.userName} updated cover photo for "${groupName}"`,
+          groupID,
+        });
+        activity.save();
+      }
 
       return res.json('Updated');
     } catch (error) {

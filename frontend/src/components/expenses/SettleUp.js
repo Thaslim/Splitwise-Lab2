@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -16,7 +16,6 @@ import {
   DialogContentText,
 } from '@material-ui/core';
 import { settleExpense } from '../../actions/group';
-
 const useStyles = makeStyles((theme) => ({
   root: {
     '& > *': {
@@ -33,19 +32,56 @@ const useStyles = makeStyles((theme) => ({
     color: 'green',
   },
 }));
-
+const findbyMemID = (arrObj, id) => {
+  const found = arrObj.filter((ele) => String(ele.memberID) === String(id));
+  return found;
+};
+const roundToTwo = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
 const SettleUp = ({
   settleUp,
   setSettleUp,
   currency,
   oweNames,
+  getBackNames,
   settleExpense,
 }) => {
-  const [settleWithEmail, setSettleWithEmail] = useState('');
+  const [settleWithID, setsettleWithID] = useState('');
+  const [consOweNames, setConsOweNames] = useState([]);
+  useEffect(() => {
+    const final = [];
+    let getBackIDS;
+    if (getBackNames.length) {
+      getBackIDS = getBackNames.map((ele) => ele.memberID);
+    }
+
+    if (oweNames.length) {
+      // eslint-disable-next-line array-callback-return
+      oweNames.map((ele) => {
+        const id = String(ele.memberID);
+        if (getBackIDS && getBackIDS.includes(id)) {
+          const getbackInfo = findbyMemID(getBackNames, id);
+          if (roundToTwo(ele.amount - getbackInfo[0].amount) > 0) {
+            final.push({
+              memberID: ele.memberID,
+              memberName: ele.memberName,
+              amount: roundToTwo(ele.amount - getbackInfo[0].amount),
+            });
+          }
+        } else {
+          final.push({
+            memberID: ele.memberID,
+            memberName: ele.memberName,
+            amount: ele.amount,
+          });
+        }
+      });
+    }
+    setConsOweNames(final);
+  }, [oweNames, getBackNames]);
 
   const onSettle = async (e) => {
     e.preventDefault();
-    settleExpense(settleWithEmail);
+    settleExpense(settleWithID);
     setTimeout(() => {
       setSettleUp(false);
     }, 1000);
@@ -60,35 +96,38 @@ const SettleUp = ({
         }}
         aria-labelledby='form-dialog-title'
       >
-        <DialogTitle style={{ background: '#1cc29f' }} id='form-dialog-title'>
+        <DialogTitle style={{ background: '#e0f2f1' }} id='form-dialog-title'>
           Settle Up
         </DialogTitle>
 
-        {!oweNames.length && (
-          <DialogContent className={classes.resize}>
-            Nothing to Settle{' '}
-          </DialogContent>
-        )}
+        {!oweNames.length ||
+          (!consOweNames.length && (
+            <DialogContent className={classes.resize}>
+              Nothing to Settle
+            </DialogContent>
+          ))}
 
-        {oweNames.length && (
+        {consOweNames.length && (
           <>
-            <DialogContentText>Select a friend to Settle.</DialogContentText>
+            <DialogContentText>
+              <br /> &nbsp; Select a friend to Settle.
+            </DialogContentText>
             <form onSubmit={(e) => onSettle(e)}>
               <DialogContent>
                 <FormControl required className={classes.root}>
                   <InputLabel>settle to</InputLabel>
                   <Select
                     id='settle-to-select'
-                    value={settleWithEmail}
-                    onChange={(e) => setSettleWithEmail(e.target.value)}
+                    value={settleWithID}
+                    onChange={(e) => setsettleWithID(e.target.value)}
                     className={classes.selectEmpty}
-                    name='settleWithEmail'
+                    name='settleWithID'
                   >
-                    {oweNames &&
-                      oweNames.map((val) => (
-                        <MenuItem key={val.email} value={val.email}>
-                          {val.name} (Amount: {currency}
-                          {-val.bal})
+                    {consOweNames &&
+                      consOweNames.map((val) => (
+                        <MenuItem key={val.memberID} value={val.memberID}>
+                          {val.memberName} (Amount: {currency}
+                          {val.amount})
                         </MenuItem>
                       ))}
                   </Select>
@@ -106,7 +145,7 @@ const SettleUp = ({
                 >
                   Cancel
                 </Button>
-                <Button type='submit' background='#1cc29f' color='secondary'>
+                <Button type='submit' color='secondary'>
                   Settle
                 </Button>
               </DialogActions>
@@ -122,6 +161,7 @@ SettleUp.propTypes = {
   settleUp: PropTypes.bool.isRequired,
   setSettleUp: PropTypes.func.isRequired,
   oweNames: PropTypes.array.isRequired,
+  getBackNames: PropTypes.array.isRequired,
   currency: PropTypes.string.isRequired,
   settleExpense: PropTypes.func.isRequired,
 };

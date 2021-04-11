@@ -19,7 +19,7 @@ import Alert from './components/landingPage/Alert';
 import { loadUser } from './actions/auth';
 import setToken from './utils/setToken';
 import MyGroups from './components/dashboard/MyGroups';
-// import RecentActivity from './components/dashboard/RecentActivity';
+import RecentActivity from './components/dashboard/RecentActivity';
 
 const App = () => {
   useEffect(() => {
@@ -51,7 +51,7 @@ const App = () => {
                 path='/my-groups/get-group/:id'
                 component={EditGroup}
               />
-              {/* <PrivateRoute exact path='/activity' component={RecentActivity} /> */}
+              <PrivateRoute path='/activity' component={RecentActivity} />
             </>
           </Switch>
         </>

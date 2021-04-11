@@ -26,6 +26,25 @@ import {
   GET_GROUP_BALANCE_ERROR,
 } from './types';
 
+// Get Recent Activity
+export const getRecentActivity = () => async (dispatch) => {
+  try {
+    const res = await axios.get('http://localhost:8000/api/activity');
+    dispatch({
+      type: GET_RECENT_ACTIVITY,
+      payload: res.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: GET_RECENT_ACTIVITY_ERROR,
+      payload: {
+        msg: error.response.statusText,
+        status: error.response.status,
+      },
+    });
+  }
+};
+
 // Get registered user list
 export const getAllUsers = () => async (dispatch) => {
   try {
@@ -52,7 +71,7 @@ export const getAllUsers = () => async (dispatch) => {
 // Get users active groups list
 export const getAcceptedGroups = () => async (dispatch) => {
   try {
-    const res = await axios.get('api/my-groups/');
+    const res = await axios.get('http://localhost:8000/api/my-groups/');
     dispatch({
       type: GET_GROUPS,
       payload: res.data,
@@ -77,13 +96,18 @@ export const addExpense = ({ groupID, description, amount, date }) => async (
       headers: { 'Content-type': 'application/json' },
     };
     const body = JSON.stringify({ groupID, description, amount, date });
-    const res = await axios.post('api/groups/', body, config);
+    const res = await axios.post(
+      'http://localhost:8000/api/groups/',
+      body,
+      config
+    );
     dispatch({
       type: ADD_EXPENSE,
       payload: res.data,
     });
     dispatch(setAlert('Expense Added', 'success'));
     dispatch(getAcceptedGroups());
+    dispatch(getRecentActivity());
   } catch (error) {
     const { errors } = error.response.data;
     if (errors) {
@@ -100,18 +124,20 @@ export const addExpense = ({ groupID, description, amount, date }) => async (
 };
 
 // Settle expense
-export const settleExpense = (settleWithEmail) => async (dispatch) => {
+export const settleExpense = (settleWithID) => async (dispatch) => {
   try {
     const config = {
       headers: { 'Content-type': 'application/json' },
     };
-    const body = JSON.stringify({ settleWithEmail });
+    const body = JSON.stringify({ settleWithID });
     const res = await axios.post('/api/settle', body, config);
     dispatch({
       type: SETTLE_EXPENSE,
       payload: res.data,
     });
     dispatch(setAlert('Settled balance', 'success'));
+    dispatch(getAcceptedGroups());
+    dispatch(getRecentActivity());
   } catch (error) {
     const { errors } = error.response.data;
     if (errors) {
@@ -142,6 +168,7 @@ export const createNewGroup = (groupData, history) => async (dispatch) => {
     dispatch(setAlert('Group created', 'success'));
     dispatch(loadUser());
     dispatch(getAcceptedGroups());
+    dispatch(getRecentActivity());
     setTimeout(() => {
       history.push('/dashboard');
     }, 300);
@@ -222,6 +249,7 @@ export const editGroupInfo = (groupData, history) => async (dispatch) => {
       payload: res.data,
     });
     dispatch(setAlert('GroupInfo updated', 'success'));
+    dispatch(getRecentActivity());
     setTimeout(() => {
       history.push('/dashboard');
     }, 500);
@@ -258,6 +286,7 @@ export const acceptGroupInvitation = (groupID, groupName) => async (
     dispatch(setAlert('Invitation Accepted', 'success'));
     dispatch(loadUser());
     dispatch(getAcceptedGroups());
+    dispatch(getRecentActivity());
   } catch (error) {
     const { errors } = error.response.data;
     if (errors) {
@@ -284,6 +313,7 @@ export const leaveGroup = (groupID, groupName) => async (dispatch) => {
       type: LEAVE_GROUP,
       payload: res.data,
     });
+    dispatch(getRecentActivity());
   } catch (error) {
     const { errors } = error.response.data;
     if (errors) {
@@ -291,25 +321,6 @@ export const leaveGroup = (groupID, groupName) => async (dispatch) => {
     }
     dispatch({
       type: LEAVE_GROUP_ERROR,
-      payload: {
-        msg: error.response.statusText,
-        status: error.response.status,
-      },
-    });
-  }
-};
-
-// Get Recent Activity
-export const getRecentActivity = () => async (dispatch) => {
-  try {
-    const res = await axios.get('api/activity');
-    dispatch({
-      type: GET_RECENT_ACTIVITY,
-      payload: res.data,
-    });
-  } catch (error) {
-    dispatch({
-      type: GET_RECENT_ACTIVITY_ERROR,
       payload: {
         msg: error.response.statusText,
         status: error.response.status,

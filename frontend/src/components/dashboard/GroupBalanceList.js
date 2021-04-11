@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import profilePic from '../user/profile-pic.png';
 
-const GroupBalanceList = ({ cls, email, amount, csymbol, imgSrc, txt }) => {
+const GroupBalanceList = ({ cls, memName, amount, csymbol, imgSrc, txt }) => {
   const src = imgSrc.userPicture
     ? `http://localhost:3000/api/images/${imgSrc.userPicture}`
     : profilePic;
@@ -20,7 +20,7 @@ const GroupBalanceList = ({ cls, email, amount, csymbol, imgSrc, txt }) => {
             marginRight: '-35%',
           }}
         >
-          {email}
+          {memName}
         </strong>
       </span>
       <span style={{ paddingLeft: '10%', fontSize: '11px' }}>
@@ -40,8 +40,8 @@ const GroupBalanceList = ({ cls, email, amount, csymbol, imgSrc, txt }) => {
 
 GroupBalanceList.propTypes = {
   cls: PropTypes.string.isRequired,
-  email: PropTypes.string.isRequired,
-  amount: PropTypes.number.isRequired,
+  memName: PropTypes.string.isRequired,
+  amount: PropTypes.number,
   csymbol: PropTypes.string.isRequired,
   txt: PropTypes.string.isRequired,
   imgSrc: PropTypes.object.isRequired,

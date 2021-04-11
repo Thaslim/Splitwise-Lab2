@@ -1,7 +1,6 @@
 import express from 'express';
 import validator from 'express-validator';
 import passport from 'passport';
-import multer from 'multer';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import Group from '../../../models/Group.js';
 import Expense from '../../../models/Expense.js';
@@ -52,7 +51,7 @@ router.get(
         { _id: 0 }
       ).populate({
         path: 'memberID',
-        select: ['userName'],
+        select: ['userName', 'userEmail', 'userPicture'],
       });
 
       res.json({
@@ -84,7 +83,6 @@ router.post(
     const { groupID, description, amount, date } = req.body;
     const paidByEmail = req.user.userEmail;
     const paidByName = req.user.userName;
-
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -169,7 +167,7 @@ router.post(
         _id: 0,
       });
       const activity = new Activity({ groupID, actionBy: req.user.id });
-      activity.action = `added ${getSymbolFromCurrency(
+      activity.action = `${req.user.userName} added ${getSymbolFromCurrency(
         req.user.userCurrency
       )}${amount} to "${groupInfo.groupName}" group`;
       activity.save();

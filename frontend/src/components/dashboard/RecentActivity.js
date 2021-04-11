@@ -1,23 +1,81 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { NavLink, useHistory } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+import { useHistory } from 'react-router-dom';
 import ListActivity from './ListActivity';
 import { sortArray } from '../../utils/findUtil';
 import { getRecentActivity } from '../../actions/group';
 import Spinner from '../landingPage/Spinner';
+import Pagination from '../../components/dashboard/Pagination';
+import { InputLabel, MenuItem, Select, FormControl } from '@material-ui/core';
+
+const useStyles = makeStyles((theme) => ({
+  formControl: {
+    minWidth: '100px',
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
+  dropDown: {
+    fontSize: '20px',
+  },
+}));
 
 const RecentActivity = ({
-  group: { recentactivity },
-  user,
+  group: { recentactivity, groups, loading, activity_loading },
   getRecentActivity,
 }) => {
+  const history = useHistory();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activityPerPage, setActivityPerPage] = useState(2);
+  const [selectGroup, setSelectGroup] = useState('');
+  const [myactivity, setMyActivity] = useState([]);
+  const [myGroupActivity, setMyGroupActivity] = useState([]);
+  const [mygroups, setMyGroups] = useState([]);
+  const classes = useStyles();
   useEffect(() => {
-    if (user) {
-      getRecentActivity();
+    if (!groups) history.push('/dashboard');
+    if (!recentactivity) getRecentActivity();
+    if (groups) setMyGroups(groups.mygroupList.groups);
+
+    if (!activity_loading && !selectGroup && recentactivity) {
+      setMyActivity(sortArray(recentactivity.myactivity));
     }
-  }, [getRecentActivity, user]);
-  return recentactivity === null ? (
+    if (selectGroup && !activity_loading && myactivity) {
+      const groupSpecific = myactivity.filter((ele) => {
+        return String(ele.groupID) === selectGroup;
+      });
+      setMyGroupActivity(groupSpecific);
+    }
+  }, [
+    getRecentActivity,
+    history,
+    groups,
+    activity_loading,
+    selectGroup,
+    recentactivity,
+    myactivity,
+  ]);
+
+  // Get Current Activity
+  const indexOfLastActivity = currentPage * activityPerPage;
+  const indexOfLastFirstActivity = indexOfLastActivity - activityPerPage;
+  let currentActivity;
+  if (selectGroup) {
+    currentActivity =
+      myGroupActivity &&
+      myGroupActivity.slice(indexOfLastFirstActivity, indexOfLastActivity);
+  } else {
+    currentActivity =
+      recentactivity &&
+      myactivity.slice(indexOfLastFirstActivity, indexOfLastActivity);
+  }
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  return activity_loading || loading || recentactivity === null ? (
     <Spinner />
   ) : (
     <div>
@@ -25,9 +83,35 @@ const RecentActivity = ({
         <div className='dashboard'>
           <div className='topbar'>
             <h1>Recent Activity</h1>
+            <div
+              style={{
+                display: 'inline',
+                float: 'right',
+                paddingRight: '10%',
+              }}
+            >
+              <FormControl className={classes.formControl}>
+                <InputLabel className={classes.dropDown}>Group</InputLabel>
+                <Select
+                  id='demo-simple-select-required'
+                  value={selectGroup}
+                  onChange={(e) => setSelectGroup(e.target.value)}
+                  className={classes.selectEmpty}
+                  name='groupID'
+                  autoWidth
+                >
+                  {mygroups &&
+                    mygroups.map((val) => (
+                      <MenuItem key={val._id} value={val._id}>
+                        {val.groupName}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            </div>
           </div>
           <ul>
-            {recentactivity && !recentactivity.myactivity.length && (
+            {recentactivity && !currentActivity.length && (
               <>
                 <div
                   style={{
@@ -41,20 +125,42 @@ const RecentActivity = ({
               </>
             )}
 
-            {user &&
-              recentactivity &&
-              sortArray(recentactivity.myactivity).map((ele) => (
-                <li key={ele.idActivity}>
-                  <ListActivity
-                    description={ele.action}
-                    groupName={ele.gName}
-                    date={ele.date}
-                    by={ele.actionByName}
-                    userWith={ele.actionWithName}
-                  />
+            {recentactivity &&
+              currentActivity.map((ele) => (
+                <li key={ele._id}>
+                  <ListActivity description={ele.action} date={ele.date} />
                 </li>
               ))}
           </ul>
+        </div>
+
+        <Pagination
+          activityPerPage={activityPerPage}
+          totalActivity={recentactivity.myactivity.length}
+          paginate={paginate}
+        />
+        <div>
+          <span
+            style={{
+              display: 'inline',
+              width: '100px',
+              float: 'right',
+              marginRight: '2%',
+              fontSize: '0.75rem',
+            }}
+          >
+            Select page size
+            <select
+              className='form-select'
+              onChange={(e) => setActivityPerPage(e.target.value)}
+            >
+              <option defaultValue value='2'>
+                Two
+              </option>
+              <option value='5'>Five</option>
+              <option value='10'>Ten</option>
+            </select>
+          </span>
         </div>
       </div>
     </div>
@@ -62,19 +168,14 @@ const RecentActivity = ({
 };
 
 RecentActivity.propTypes = {
-  user: PropTypes.array,
-
   getRecentActivity: PropTypes.func.isRequired,
   group: PropTypes.object.isRequired,
 };
 
-RecentActivity.defaultProps = {
-  user: null,
-};
 const mapStateToProps = (state) => ({
-  user: state.auth.user,
-  dashboard: state.dashboard,
   group: state.group,
   isAuthenticated: state.auth.isAuthenticated,
 });
-export default connect(mapStateToProps, { getRecentActivity })(RecentActivity);
+export default connect(mapStateToProps, {
+  getRecentActivity,
+})(RecentActivity);

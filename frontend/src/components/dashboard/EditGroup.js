@@ -4,14 +4,13 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Spinner from '../landingPage/Spinner';
 import splitwiselogo from '../landingPage/splitwise.svg';
-import { editGroupInfo, getAcceptedGroups } from '../../actions/group';
+import { editGroupInfo } from '../../actions/group';
 import profilePic from '../user/profile-pic.png';
 import { findbyID } from '../../utils/findUtil';
 
 const EditGroup = ({
   match,
-  getAcceptedGroups,
-  group: { groups, loading },
+  group: { groups, loading, groupBalance },
   editGroupInfo,
 }) => {
   const history = useHistory();
@@ -21,7 +20,7 @@ const EditGroup = ({
   const [filePath, setFilePath] = useState('');
 
   useEffect(() => {
-    if (!groups) getAcceptedGroups();
+    if (!groups) history.push('/dashboard');
     if (groups && groups.mygroupList.groups.length) {
       const groupDetails = findbyID(groups.mygroupList.groups, match.params.id);
       setGroupName(!groupDetails[0].groupName ? '' : groupDetails[0].groupName);
@@ -31,9 +30,12 @@ const EditGroup = ({
           `http://localhost:3000/api/images/${groupDetails[0].groupPicture}`
         );
       }
-      setGroupMemInfo(groupDetails[0].members);
     }
-  }, [getAcceptedGroups, loading, match, groups]);
+
+    if (groupBalance) {
+      setGroupMemInfo(groupBalance.members);
+    }
+  }, [match, groups, groupBalance, history]);
 
   const onSaveChanges = async (e) => {
     e.preventDefault();
@@ -44,7 +46,7 @@ const EditGroup = ({
     editGroupInfo(groupData, history);
   };
 
-  return loading || !groups ? (
+  return loading || !groupBalance ? (
     <Spinner />
   ) : (
     <div className='container-fluid'>
@@ -142,13 +144,10 @@ const EditGroup = ({
 EditGroup.propTypes = {
   editGroupInfo: PropTypes.func.isRequired,
   group: PropTypes.object.isRequired,
-  getAcceptedGroups: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   user: state.auth.user,
   group: state.group,
 });
-export default connect(mapStateToProps, { editGroupInfo, getAcceptedGroups })(
-  EditGroup
-);
+export default connect(mapStateToProps, { editGroupInfo })(EditGroup);

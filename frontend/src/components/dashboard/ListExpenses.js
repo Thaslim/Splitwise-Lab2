@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 import { getMonthDate } from '../../utils/findUtil';
 
 const ListExpenses = ({
@@ -12,13 +13,18 @@ const ListExpenses = ({
   currency,
   cls,
 }) => {
-  const dt = new Date(date);
+  const dt = moment(date).local().format('YYYY-MM-DD HH:mm:ss');
+  let dtDate;
+  let dtMonth;
+  if (moment(dt).date() === 31) {
+    dtDate = 1;
+    dtMonth = moment(dt).month() + 1;
+  } else {
+    dtDate = moment(dt).date() + 1;
+    dtMonth = moment(dt).month();
+  }
   return (
-    <div
-      data-testid='listexpense'
-      className='expense'
-      style={{ height: '70%' }}
-    >
+    <div data-testid='listexpense' className='list-group-item'>
       <div className='main-block'>
         <div
           className='date'
@@ -31,7 +37,7 @@ const ListExpenses = ({
             float: 'left',
           }}
         >
-          {getMonthDate(dt.getMonth())}
+          {getMonthDate(dtMonth)}
           <div
             className='number'
             style={{
@@ -39,7 +45,7 @@ const ListExpenses = ({
               fontSize: '20px',
             }}
           >
-            {dt.getDate()}
+            {dtDate}
           </div>
         </div>
         <i
@@ -57,11 +63,10 @@ const ListExpenses = ({
       <div
         className='cost'
         style={{
-          color: '#aaa',
-          padding: '11px 10px 12px 50px',
+          padding: '11px 10px 0px 10px',
           overflow: 'hidden',
           float: 'left',
-          clear: 'none',
+          width: '125px',
         }}
       >
         &nbsp;
@@ -79,8 +84,7 @@ const ListExpenses = ({
       <div
         className='you'
         style={{
-          color: '#aaa',
-          padding: '11px 10px 12px 50px',
+          padding: '11px 10px 0px 10px',
           overflow: 'hidden',
         }}
       >

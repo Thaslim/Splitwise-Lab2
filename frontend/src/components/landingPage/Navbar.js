@@ -34,20 +34,16 @@ const Navbar = ({ user, isAuthenticated, loading, logout }) => {
   const loggedInLinks = (
     <ul className='navbar-nav ms-auto'>
       <li className='nav-item dropdown'>
-        <Link
+        <button
           onClick={toggleOpen}
-          className='nav-link dropdown-toggle'
-          to='#'
+          className='nav-link dropdown-toggle rounded-pill border border-light'
           id='navbarDropdown'
-          role='button'
           data-toggle='dropdown'
-          aria-haspopup='true'
-          aria-expanded='false'
         >
           {user && <img src={fp} className='userImage' alt='prfilePic' />}
           &nbsp;
           {user && nameFormat}
-        </Link>
+        </button>
 
         <div className={menuClass} aria-labelledby='navbarDropdown'>
           <Link className='dropdown-item' to='/me'>

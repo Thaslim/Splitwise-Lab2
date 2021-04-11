@@ -2,16 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { getMonthDate } from '../../utils/findUtil';
 
-const ListActivity = ({ description, date, groupName, by, userWith }) => {
-  console.log(description);
+const ListActivity = ({ description, date }) => {
   const dt = new Date(date);
   return (
-    <div
-      data-testid='listexpense'
-      className='expense'
-      style={{ height: '70%' }}
-    >
-      <div className='activity-list'>
+    <div className='list-group-item'>
+      <div>
         <div
           className='date'
           style={{
@@ -39,37 +34,11 @@ const ListActivity = ({ description, date, groupName, by, userWith }) => {
           style={{
             fontSize: '25px',
             color: '#555555',
-            marginTop: '5%',
+            marginTop: '2.5%',
             opacity: '0.6',
           }}
         />
-        &nbsp;
-        {description === 'created group' && (
-          <>
-            {by} &nbsp;
-            {description} {groupName}
-          </>
-        )}
-        {description === 'invited' && (
-          <>
-            {by} &nbsp;
-            {description} {userWith} to {groupName}
-          </>
-        )}
-        {description === 'accepted invitation' && (
-          <>
-            {by} &nbsp;
-            {description} for {groupName}
-          </>
-        )}
-        {description !== 'accepted invitation' &&
-          description !== 'invited' &&
-          description !== 'created group' && (
-            <>
-              {by} &nbsp;
-              {description} in {groupName}
-            </>
-          )}
+        &nbsp; {description}
       </div>
     </div>
   );
@@ -77,9 +46,6 @@ const ListActivity = ({ description, date, groupName, by, userWith }) => {
 
 ListActivity.propTypes = {
   description: PropTypes.string.isRequired,
-  userWith: PropTypes.string.isRequired,
-  groupName: PropTypes.string.isRequired,
-  by: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
 };
 

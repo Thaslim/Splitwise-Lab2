@@ -4,15 +4,11 @@ import { NavLink, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import AddBillPopUp from '../expenses/AddBillPopUp';
-import {
-  getGroupActivity,
-  getAcceptedGroups,
-  getGroupBalances,
-} from '../../actions/group';
+import { getGroupActivity, getGroupBalances } from '../../actions/group';
+
 import { findbyID, sortArray } from '../../utils/findUtil';
 import Spinner from '../landingPage/Spinner';
 import profilePic from '../user/profile-pic.png';
-import SettleUp from '../expenses/SettleUp';
 import ListExpenses from './ListExpenses';
 import { roundToTwo } from '../../utils/calc';
 import GroupBalanceList from './GroupBalanceList';
@@ -23,14 +19,13 @@ const Groups = ({
   user,
   getGroupActivity,
   getGroupBalances,
-  getAcceptedGroups,
   isAuthenticated,
 }) => {
   const [billPopUp, setBillPopUp] = useState(false);
-  const [settleUp, setSettleUp] = useState(false);
   const [cSymbol, setCSymbol] = useState('');
   const [groupName, setGroupName] = useState('');
   const [groupImg, setGroupImg] = useState('');
+
   const history = useHistory();
   useEffect(() => {
     if (!groups) history.push('/dashboard');
@@ -56,7 +51,6 @@ const Groups = ({
     groups,
     isAuthenticated,
     user,
-    getAcceptedGroups,
     history,
   ]);
   return groupActivity === null || groupBalance === null ? (
@@ -94,16 +88,6 @@ const Groups = ({
                 }}
               >
                 Add an expense
-              </button>
-              &emsp;
-              <button
-                type='button'
-                className='btn btn-large bg-teal text-white'
-                onClick={() => {
-                  setSettleUp(true);
-                }}
-              >
-                Settle up
               </button>
               &emsp;
             </div>
@@ -149,7 +133,7 @@ const Groups = ({
                   );
                 }
                 return (
-                  <li key={ele._id}>
+                  <li key={ele._id} className='expense-pop'>
                     <ListExpenses
                       description={ele.description}
                       paidAmount={paidAmount}
@@ -174,17 +158,6 @@ const Groups = ({
               />
             </>
           )}
-          {/* {settleUp && (
-            <>
-              <SettleUp
-                settleUp={settleUp}
-                setSettleUp={setSettleUp}
-                mygroups={groups && groups.mygroupList.groups}
-                currency={cSymbol}
-                oweNames={oweNames}
-              />
-            </>
-          )} */}
         </div>
       </div>
 
@@ -203,17 +176,21 @@ const Groups = ({
               let cls;
               let txt;
               let amount;
-              if (ele.give) {
-                cls = 'negative';
-                txt = 'owes';
-                amount = ele.give;
-              }
-              if (ele.getBack) {
-                cls = 'positive';
-                txt = 'gets back';
-                amount = ele.getBack;
-              }
-              if (!ele.getBack && !ele.give) {
+              if (ele.give || ele.getBack) {
+                const settleBal = roundToTwo(ele.getBack - ele.give);
+                if (settleBal > 0.5) {
+                  cls = 'positive';
+                  txt = 'gets back';
+                  amount = settleBal;
+                } else if (settleBal < -0.5) {
+                  cls = 'negative';
+                  txt = 'owes';
+                  amount = -settleBal;
+                } else {
+                  cls = 'neutral';
+                  txt = 'settled up';
+                }
+              } else {
                 cls = 'neutral';
                 txt = 'settled up';
               }
@@ -225,7 +202,7 @@ const Groups = ({
                     cls={cls}
                     amount={amount}
                     csymbol={cSymbol}
-                    email={ele.memberID.userName}
+                    memName={ele.memberID.userName}
                     txt={txt}
                   />
                 </li>
@@ -242,7 +219,6 @@ Groups.propTypes = {
   isAuthenticated: PropTypes.bool,
   getGroupActivity: PropTypes.func.isRequired,
   group: PropTypes.object.isRequired,
-  getAcceptedGroups: PropTypes.func.isRequired,
 };
 
 Groups.defaultProps = {
@@ -256,6 +232,5 @@ const mapStateToProps = (state) => ({
 });
 export default connect(mapStateToProps, {
   getGroupActivity,
-  getAcceptedGroups,
   getGroupBalances,
 })(Groups);

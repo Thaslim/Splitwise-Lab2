@@ -13,6 +13,7 @@ import {
   CLEAR_GROUPS,
   CLEAR_GROUP_ACTIVITY,
   CLEAR_GROUP_BALANCE,
+  CLEAR_RECENT_ACTIVITY,
 } from './types';
 
 // Load User
@@ -66,9 +67,7 @@ export const signup = ({ userName, userEmail, userPassword }) => async (
 };
 
 // Login User
-export const login = ({ userEmail, userPassword, history }) => async (
-  dispatch
-) => {
+export const login = ({ userEmail, userPassword }) => async (dispatch) => {
   const config = {
     headers: { 'content-type': 'application/json' },
   };
@@ -82,7 +81,6 @@ export const login = ({ userEmail, userPassword, history }) => async (
     });
     dispatch(loadUser());
     dispatch(getAcceptedGroups());
-    history.push('/dashboard');
   } catch (err) {
     const { errors } = err.response.data;
 
@@ -99,6 +97,7 @@ export const login = ({ userEmail, userPassword, history }) => async (
 // Logout
 export const logout = () => (dispatch) => {
   dispatch({ type: CLEAR_GROUP_ACTIVITY });
+  dispatch({ type: CLEAR_RECENT_ACTIVITY });
   dispatch({ type: CLEAR_GROUP_BALANCE });
   dispatch({ type: CLEAR_GROUPS });
   dispatch({ type: LOGOUT });

@@ -41,6 +41,7 @@ const initialState = {
   loading: true,
   expenseAdded: false,
   expenseSettled: false,
+  activity_loading: true,
 };
 
 function groupReducer(state = initialState, action) {
@@ -101,6 +102,7 @@ function groupReducer(state = initialState, action) {
       return {
         ...state,
         recentactivity: payload,
+        activity_loading: false,
       };
 
     case CLEAR_RECENT_ACTIVITY:

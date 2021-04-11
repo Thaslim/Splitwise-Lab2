@@ -283,12 +283,7 @@ select {
   padding-top: 2%;
   height: 100%;
   background-color: #eee;
-  margin-left: -12px;
   border-top: 1px solid #ddd;
-  border-left: 1px solid #ccc;
-  border-right: 1px solid #ccc;
-  margin-right: -12px;
-  box-shadow: 0 0 12px rgb(0 0 0 / 20%);
 }
 .new-group {
   display: inline;
@@ -298,6 +293,7 @@ select {
   margin-left: 30%;
   width: 620px;
   position: static;
+  border-top: 1px solid #ccc;
   border-left: 1px solid #ccc;
   border-right: 1px solid #ccc;
   box-shadow: 0 0 12px rgb(0 0 0 / 20%);
@@ -366,29 +362,23 @@ select {
 
 .main-block {
   width: 307px;
-  padding: 9px 5px 6px 20px;
+  /* padding: 9px 5px 6px 20px; */
   position: relative;
   float: left;
-  clear: none;
+  /* clear: none; */
 }
 
 .mygroups {
   width: 60%;
-  /* padding-right: 20; */
   margin-top: 3.5%;
-  /* background-color: rgb(194, 219, 218); */
   margin-left: auto;
   margin-right: auto;
 }
 
-.activity-list {
-  /* width: 307px; */
-  padding: 9px 5px 6px 20px;
-  /* position: relative; */
-  /* float: left; */
-  clear: none;
-}
-
 .neutral {
   color: #aaa;
+}
+
+li .list-group-item:hover {
+  background-color: #eee;
 }

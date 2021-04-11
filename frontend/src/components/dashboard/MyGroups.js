@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
 import SearchBar from 'material-ui-search-bar';
-import {
-  acceptGroupInvitation,
-  leaveGroup,
-  getAcceptedGroups,
-} from '../../actions/group';
+import { acceptGroupInvitation, leaveGroup } from '../../actions/group';
 import { findbyName } from '../../utils/findUtil';
 import profilePic from '../user/profile-pic.png';
 
 const MyGroups = ({
-  getAcceptedGroups,
   user,
   leaveGroup,
   isAuthenticated,
@@ -23,17 +18,14 @@ const MyGroups = ({
   const [invites, setInvites] = useState([]);
   const [searchGroup, setSearchGroup] = useState('');
   const [showGroupInfo, setShowGroupInfo] = useState([]);
-
+  const history = useHistory();
   useEffect(() => {
-    if (isAuthenticated && user && !groups) {
-      getAcceptedGroups();
-    }
-
+    if (!groups) history.push('/dashboard');
     if (groups) {
       setAccList(groups.mygroupList.groups);
       setInvites(groups.mygroupList.invites);
     }
-  }, [getAcceptedGroups, groups, isAuthenticated, user]);
+  }, [groups, history, isAuthenticated, user]);
 
   const showGroup = (value) => {
     const found = findbyName(accList, value);
@@ -145,7 +137,6 @@ MyGroups.propTypes = {
   acceptGroupInvitation: PropTypes.func.isRequired,
   leaveGroup: PropTypes.func.isRequired,
   group: PropTypes.object.isRequired,
-  getAcceptedGroups: PropTypes.func.isRequired,
 };
 
 MyGroups.defaultProps = {
@@ -160,5 +151,4 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps, {
   acceptGroupInvitation,
   leaveGroup,
-  getAcceptedGroups,
 })(MyGroups);

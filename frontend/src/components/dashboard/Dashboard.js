@@ -34,21 +34,21 @@ const Dashboard = ({
       setCSymbol(getSymbolFromCurrency(user.userCurrency));
     }
 
-    if ((user && !groups) || groupInfo === 'Updated') {
+    if (user && loading) {
       getAcceptedGroups();
     }
     if (user && groups && groups.mygroupList.iOwe.length) {
       const uniqueIoweMembers = _(groups.mygroupList.iOwe)
         .groupBy('memberID._id')
         .map((obj, key) => ({
+          memberID: key,
           memberName: obj[0].memberID.userName,
           amount: roundToTwo(_.sumBy(obj, 'amount')),
           memberPic: obj[0].memberID.userPicture || '',
         }))
         .value();
       setOweNames(uniqueIoweMembers);
-
-      const iOweAmount = _.sumBy(groups.mygroupList.iOwe, 'amount');
+      const iOweAmount = roundToTwo(_.sumBy(groups.mygroupList.iOwe, 'amount'));
       setOwe(iOweAmount);
 
       const memBalanceEachGroup = getIndividualGroupBalance(
@@ -61,6 +61,7 @@ const Dashboard = ({
       const uniqueOweToMeMembers = _(groups.mygroupList.owedToMe)
         .groupBy('memberID._id')
         .map((obj, key) => ({
+          memberID: key,
           memberName: obj[0].memberID.userName,
           amount: roundToTwo(_.sumBy(obj, 'amount')),
           memberPic: obj[0].memberID.userPicture || '',
@@ -69,7 +70,9 @@ const Dashboard = ({
 
       setgetBackNames(uniqueOweToMeMembers);
 
-      const getBackAmount = _.sumBy(groups.mygroupList.owedToMe, 'amount');
+      const getBackAmount = roundToTwo(
+        _.sumBy(groups.mygroupList.owedToMe, 'amount')
+      );
 
       setGetBack(getBackAmount);
 
@@ -78,7 +81,6 @@ const Dashboard = ({
       );
       setGetBackFromGroupNames(memBalanceEachGroup);
     }
-
     setTotalBalance(roundToTwo(getBack - owe));
   }, [
     getAcceptedGroups,
@@ -282,17 +284,17 @@ const Dashboard = ({
             />
           </>
         )}
-        {/* {settleUp && (
+        {settleUp && (
           <>
             <SettleUp
               settleUp={settleUp}
               setSettleUp={setSettleUp}
-              mygroups={groups && groups.mygroupList.groups}
               currency={cSymbol}
               oweNames={oweNames}
+              getBackNames={getBackNames}
             />
           </>
-        )} */}
+        )}
       </div>
     </div>
   );

@@ -130,7 +130,7 @@ router.post(
       groupMembers.save();
 
       const activity = new Activity({ actionBy: req.user.id, groupID });
-      activity.action = `created "${groupName}" group`;
+      activity.action = `${req.user.userName} created "${groupName}" group`;
       activity.save();
 
       let ids = [];

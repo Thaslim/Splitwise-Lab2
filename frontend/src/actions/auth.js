@@ -14,6 +14,7 @@ import {
   CLEAR_GROUP_ACTIVITY,
   CLEAR_GROUP_BALANCE,
   CLEAR_RECENT_ACTIVITY,
+  CLEAR_COMMENTS,
 } from './types';
 
 // Load User
@@ -97,6 +98,7 @@ export const login = ({ userEmail, userPassword }) => async (dispatch) => {
 // Logout
 export const logout = () => (dispatch) => {
   dispatch({ type: CLEAR_GROUP_ACTIVITY });
+  dispatch({ type: CLEAR_COMMENTS });
   dispatch({ type: CLEAR_RECENT_ACTIVITY });
   dispatch({ type: CLEAR_GROUP_BALANCE });
   dispatch({ type: CLEAR_GROUPS });

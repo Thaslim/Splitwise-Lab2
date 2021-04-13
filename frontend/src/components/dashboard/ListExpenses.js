@@ -1,5 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import receipt from './receipt.png';
+import {
+  postComments,
+  getComments,
+  deleteComment,
+} from '../../actions/comment';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import moment from 'moment';
 import { getMonthDate } from '../../utils/findUtil';
 
@@ -10,19 +17,43 @@ const ListExpenses = ({
   paidby,
   lent,
   date,
+  month,
   currency,
   cls,
+  id,
+  year,
+  postComments,
+  getComments,
+  deleteComment,
+  user,
+  comment: { comments, loading },
 }) => {
-  const dt = moment(date).local().format('YYYY-MM-DD HH:mm:ss');
-  let dtDate;
-  let dtMonth;
-  if (moment(dt).date() === 31) {
-    dtDate = 1;
-    dtMonth = moment(dt).month() + 1;
-  } else {
-    dtDate = moment(dt).date() + 1;
-    dtMonth = moment(dt).month();
-  }
+  const [message, setMessage] = useState('');
+  const [notes, setNotes] = useState([]);
+
+  const handlePost = async (e, id, message) => {
+    e.preventDefault();
+    postComments({ expenseID: id, message });
+    setMessage('');
+  };
+
+  const delComment = (commentID) => {
+    deleteComment({ expenseID: id, commentID });
+  };
+  const handleClick = (id) => {
+    const x = document.querySelector(`[data-listid="${id}"]`);
+    if (x.style.display === 'none') {
+      x.style.display = 'table';
+      getComments(id);
+    } else {
+      x.style.display = 'none';
+      setNotes([]);
+    }
+  };
+
+  useEffect(() => {
+    if (comments) setNotes(comments.comments);
+  }, [comments]);
   return (
     <div data-testid='listexpense' className='list-group-item'>
       <div className='main-block'>
@@ -37,7 +68,7 @@ const ListExpenses = ({
             float: 'left',
           }}
         >
-          {getMonthDate(dtMonth)}
+          {month}
           <div
             className='number'
             style={{
@@ -45,7 +76,7 @@ const ListExpenses = ({
               fontSize: '20px',
             }}
           >
-            {dtDate}
+            {date}
           </div>
         </div>
         <i
@@ -58,7 +89,15 @@ const ListExpenses = ({
           }}
         />
         &nbsp;
-        {description}
+        <span
+          className='expense-desc'
+          style={{ display: 'inline' }}
+          onClick={() => {
+            handleClick(id);
+          }}
+        >
+          &nbsp; {description}
+        </span>
       </div>
       <div
         className='cost'
@@ -100,19 +139,124 @@ const ListExpenses = ({
           {lentAmount}
         </span>
       </div>
+      <table
+        className='expense-comments'
+        data-listid={id}
+        style={{ display: 'none' }}
+      >
+        <tbody>
+          <tr>
+            <td colSpan='2'>
+              <img
+                style={{ width: '50px' }}
+                src={receipt}
+                className='category'
+                alt='recipt logo'
+              ></img>
+              <h5>{description}</h5>
+              <div className='cost'>
+                {currency}
+                {paidAmount}
+              </div>
+              <div className='creation_info'>
+                Added by {paidby} on {month} {date}, {year}
+              </div>
+            </td>
+          </tr>
+
+          <tr className='blank_row'>
+            <td colSpan='3'></td>
+          </tr>
+          <tr>
+            <td className='right'>
+              <div className='comments'>
+                <h5
+                  style={{
+                    fontSize: '12px',
+                    color: 'rgb(143, 138, 138)',
+                  }}
+                >
+                  <i className='fas fa-comments'></i> NOTES AND COMMENTS
+                </h5>
+                <ul>
+                  {notes &&
+                    notes.map((comment) => {
+                      const dt = moment(comment.date)
+                        .local()
+                        .format('YYYY-MM-DD');
+
+                      const currentUser = comment.from === user.userName;
+
+                      return (
+                        <li key={comment._id}>
+                          <div className='comment User'>
+                            <div style={{ fontWeight: 'bold' }}>
+                              {comment.from}
+                              <span
+                                style={{ display: 'inline' }}
+                                className='timestamp'
+                              >
+                                {getMonthDate(moment(dt).month())}{' '}
+                                {moment(dt).date()}
+                              </span>
+
+                              {currentUser && (
+                                <i
+                                  className='fas fa-times delete_comment'
+                                  onClick={() =>
+                                    delComment(String(comment._id))
+                                  }
+                                />
+                              )}
+                            </div>
+                            {comment.message}
+                          </div>
+                        </li>
+                      );
+                    })}
+                </ul>
+
+                <div className='add_comment'>
+                  <textarea
+                    placeholder='Add a comment'
+                    cols='35'
+                    rows='2'
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                  ></textarea>
+
+                  <button
+                    type='submit'
+                    className='btn btn-small btn-orange'
+                    onClick={(e) => handlePost(e, id, message)}
+                  >
+                    Post
+                  </button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 };
 
 ListExpenses.propTypes = {
-  description: PropTypes.string.isRequired,
-  paidAmount: PropTypes.number.isRequired,
-  lentAmount: PropTypes.number.isRequired,
-  paidby: PropTypes.string.isRequired,
-  lent: PropTypes.string.isRequired,
-  date: PropTypes.string.isRequired,
-  currency: PropTypes.string.isRequired,
-  cls: PropTypes.string.isRequired,
+  postComments: PropTypes.func.isRequired,
+  getComments: PropTypes.func.isRequired,
+  deleteComment: PropTypes.func.isRequired,
+  comment: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
 };
 
-export default ListExpenses;
+const mapStateToProps = (state) => ({
+  comment: state.comment,
+  user: state.auth.user,
+});
+
+export default connect(mapStateToProps, {
+  postComments,
+  getComments,
+  deleteComment,
+})(ListExpenses);

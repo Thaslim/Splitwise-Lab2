@@ -51,7 +51,7 @@ const App = () => {
                 path='/my-groups/get-group/:id'
                 component={EditGroup}
               />
-              <PrivateRoute path='/activity' component={RecentActivity} />
+              <PrivateRoute exact path='/activity' component={RecentActivity} />
             </>
           </Switch>
         </>

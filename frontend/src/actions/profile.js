@@ -18,9 +18,7 @@ export const updateUserProfile = (profileData, history) => async (dispatch) => {
     dispatch(setAlert('Profile updated', 'success'));
     dispatch(loadUser());
     dispatch(getAcceptedGroups());
-    setTimeout(() => {
-      history.push('/dashboard');
-    }, 800);
+    history.push('/dashboard');
   } catch (error) {
     const { errors } = error.response.data;
 

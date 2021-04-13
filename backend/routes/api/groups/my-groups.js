@@ -105,10 +105,10 @@ router.post(
         owedToMe: 1,
         _id: 0,
       });
-      const groups1 = currentUserBal.iOwe.filter((ele) => {
+      const groups1 = currentUserBalances.iOwe.filter((ele) => {
         return String(ele.groupID) === String(groupID);
       });
-      const groups2 = currentUserBal.owedToMe.filter((ele) => {
+      const groups2 = currentUserBalances.owedToMe.filter((ele) => {
         return String(ele.groupID) === String(groupID);
       });
 
@@ -123,15 +123,16 @@ router.post(
       }
 
       await GroupMembers.deleteOne({ groupID, memberID: req.user.id });
+      await User.findByIdAndUpdate(req.user.id, { $pull: { groups: groupID } });
       const activity = new Activity({
-        actionBy: req.user.userName,
+        actionBy: req.user.id,
         action: `${req.user.userName} left from the group ${groupName}`,
         groupID,
       });
       activity.save();
       res.send('left from group');
     } catch (error) {
-      console.error(error);
+      console.log(error);
       res.status(500).send('Server error');
     }
   }

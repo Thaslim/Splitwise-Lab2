@@ -1,6 +1,5 @@
 import axios from 'axios';
 import setAlert from './alert';
-import { loadUser } from './auth';
 import {
   CREATE_GROUP,
   CREATE_GROUP_ERROR,
@@ -166,12 +165,9 @@ export const createNewGroup = (groupData, history) => async (dispatch) => {
       payload: res.data,
     });
     dispatch(setAlert('Group created', 'success'));
-    dispatch(loadUser());
     dispatch(getAcceptedGroups());
     dispatch(getRecentActivity());
-    setTimeout(() => {
-      history.push('/dashboard');
-    }, 300);
+    history.push('/dashboard');
   } catch (error) {
     const { errors } = error.response.data;
     if (errors) {
@@ -250,9 +246,7 @@ export const editGroupInfo = (groupData, history) => async (dispatch) => {
     });
     dispatch(setAlert('GroupInfo updated', 'success'));
     dispatch(getRecentActivity());
-    setTimeout(() => {
-      history.push('/dashboard');
-    }, 500);
+    history.push('/dashboard');
   } catch (error) {
     dispatch({
       type: EDIT_GROUP_INFO_ERROR,
@@ -284,7 +278,6 @@ export const acceptGroupInvitation = (groupID, groupName) => async (
       payload: res.data,
     });
     dispatch(setAlert('Invitation Accepted', 'success'));
-    dispatch(loadUser());
     dispatch(getAcceptedGroups());
     dispatch(getRecentActivity());
   } catch (error) {
@@ -313,6 +306,7 @@ export const leaveGroup = (groupID, groupName) => async (dispatch) => {
       type: LEAVE_GROUP,
       payload: res.data,
     });
+    dispatch(getAcceptedGroups());
     dispatch(getRecentActivity());
   } catch (error) {
     const { errors } = error.response.data;

@@ -382,3 +382,44 @@ select {
 li .list-group-item:hover {
   background-color: #eee;
 }
+.blank_row {
+  height: 1.5px !important; /* overwrites any other rules */
+  background-color: rgb(143, 138, 138);
+}
+
+td.right {
+  width: 245px;
+  padding-top: 4px;
+  padding-left: 260px;
+  padding-bottom: 5px;
+}
+
+.expense-desc:hover {
+  cursor: pointer;
+}
+
+.comment {
+  border: 1px solid #ccc;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  padding: 6px 8px;
+  background: #fff;
+  margin-bottom: 8px;
+  word-wrap: break-word;
+}
+.delete_comment {
+  float: right;
+  color: #c00;
+  font-weight: bold;
+  font-size: 18px;
+  margin: -1px -1px 5px 5px;
+  cursor: pointer;
+}
+
+.timestamp {
+  margin-left: 3px;
+  color: #999;
+  font-size: 11px;
+  font-weight: normal;
+}

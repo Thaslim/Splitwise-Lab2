@@ -17,6 +17,7 @@ import groupsRouter from './routes/api/groups/groups.js';
 import imageRetrieve from './routes/api/aws-s3/retrieve-file.js';
 import settleRouter from './routes/api/groups/settleUp.js';
 import activityRouter from './routes/api/groups/activity.js';
+import commentRouter from './routes/api/groups/expense-comment.js';
 
 dotenv.config({ path: './config/.env' });
 
@@ -45,6 +46,8 @@ app.use('/api/groups', groupsRouter);
 app.use('/api/images', imageRetrieve);
 app.use('/api/settle', settleRouter);
 app.use('/api/activity', activityRouter);
+app.use('/api/expense', commentRouter);
+
 const port = process.env.PORT || 8000;
 
 app.listen(port, () => {

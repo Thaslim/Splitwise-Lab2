@@ -51,7 +51,7 @@ const MyGroups = ({
                       className='userImage'
                       src={
                         (el.groupPicture &&
-                          `/static/uploaded_images/groups/${el.groupPicture}`) ||
+                          `http://localhost:3000/api/images/${el.groupPicture}`) ||
                         profilePic
                       }
                       alt='groupPic'
@@ -102,7 +102,7 @@ const MyGroups = ({
                         className='userImage'
                         src={
                           (el.groupPicture &&
-                            `/static/uploaded_images/groups/${el.groupPicture}`) ||
+                            `http://localhost:3000/api/images/${el.groupPicture}`) ||
                           profilePic
                         }
                         alt='groupPic'
@@ -114,9 +114,7 @@ const MyGroups = ({
                     <button
                       type='submit'
                       className='btm btn-outline-danger btn-md rounded'
-                      onClick={() =>
-                        leaveGroup(`${el.groupID}`, `${el.groupName}`)
-                      }
+                      onClick={() => leaveGroup(`${el._id}`, `${el.groupName}`)}
                     >
                       Leave Group
                     </button>

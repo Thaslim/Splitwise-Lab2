@@ -5,16 +5,19 @@ import PropTypes from 'prop-types';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import AddBillPopUp from '../expenses/AddBillPopUp';
 import { getGroupActivity, getGroupBalances } from '../../actions/group';
-
+import moment from 'moment';
 import { findbyID, sortArray } from '../../utils/findUtil';
+import { getMonthDate } from '../../utils/findUtil';
 import Spinner from '../landingPage/Spinner';
 import profilePic from '../user/profile-pic.png';
 import ListExpenses from './ListExpenses';
 import { roundToTwo } from '../../utils/calc';
+
 import GroupBalanceList from './GroupBalanceList';
 
 const Groups = ({
   group: { groupActivity, groups, groupBalance },
+
   match,
   user,
   getGroupActivity,
@@ -108,12 +111,23 @@ const Groups = ({
             )}
             {user &&
               groupActivity.groupExpense &&
-              sortArray(groupActivity.groupExpense.expenses).map((ele) => {
+              sortArray(groupActivity.groupExpense.expenses).map((ele, id) => {
                 let paid;
                 let lent;
                 let cls;
                 let lentAmount;
-
+                const dt = moment(ele.date)
+                  .local()
+                  .format('YYYY-MM-DD HH:mm:ss');
+                let dtDate;
+                let dtMonth;
+                if (moment(dt).date() === 31) {
+                  dtDate = 1;
+                  dtMonth = moment(dt).month() + 1;
+                } else {
+                  dtDate = moment(dt).date() + 1;
+                  dtMonth = moment(dt).month();
+                }
                 const paidAmount = ele.amount;
 
                 if (ele.paidByEmail === user.userEmail) {
@@ -140,9 +154,12 @@ const Groups = ({
                       lentAmount={lentAmount}
                       paidby={paid}
                       lent={lent}
-                      date={ele.date}
+                      date={dtDate}
+                      month={getMonthDate(dtMonth)}
+                      year={moment(dt).year()}
                       currency={cSymbol}
                       cls={cls}
+                      id={String(ele._id)}
                     />
                   </li>
                 );
@@ -218,6 +235,7 @@ Groups.propTypes = {
   user: PropTypes.object,
   isAuthenticated: PropTypes.bool,
   getGroupActivity: PropTypes.func.isRequired,
+  getGroupBalances: PropTypes.func.isRequired,
   group: PropTypes.object.isRequired,
 };
 

@@ -7,6 +7,13 @@ const ExpenseSchema = new mongoose.Schema({
   paidByEmail: { type: String, required: true },
   date: { type: Date, required: true },
   updatedDate: { type: Date, default: Date.now },
+  messages: [
+    {
+      from: { type: String },
+      message: { type: String },
+      date: { type: Date, default: Date.now },
+    },
+  ],
 });
 
 export default mongoose.model('expense', ExpenseSchema);

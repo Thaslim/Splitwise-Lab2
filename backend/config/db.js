@@ -12,6 +12,7 @@ const connectDB = async () => {
       useUnifiedTopology: true,
       useCreateIndex: true,
       useFindAndModify: false,
+      poolSize: 10,
     });
     console.log('MongoDB connected...');
   } catch (error) {

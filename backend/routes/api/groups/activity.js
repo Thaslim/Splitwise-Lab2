@@ -1,27 +1,26 @@
 import express from 'express';
 import passport from 'passport';
-import User from '../../../models/User.js';
-import Activity from '../../../models/Activity.js';
+import make_request from '../../../kafka/client.js';
 
 const router = express.Router();
 export default router;
 
-// @route POST api/activity
-// @desc Update profile information
+// @route GET api/activity
+// @desc Get recent activity
 // @access Private
 router.get(
   '/',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
-    try {
-      const myGroups = await User.findById(req.user.id, { groups: 1, _id: 0 });
-      const myactivity = await Activity.find({
-        groupID: { $in: myGroups.groups },
-      });
-      res.send({ myactivity });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Server error');
-    }
+    const myData = { action: 'getActivity', userID: req.user.id };
+    make_request('groups', myData, (err, results) => {
+      if (err) {
+        res.status(500).json({
+          errors: [{ msg: err }],
+        });
+      } else {
+        res.status(200).json({ myactivity: results.message });
+      }
+    });
   }
 );

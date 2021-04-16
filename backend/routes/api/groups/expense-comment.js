@@ -1,7 +1,6 @@
 import express from 'express';
-import validator from 'express-validator';
 import passport from 'passport';
-import Expense from '../../../models/Expense.js';
+import make_request from '../../../kafka/client.js';
 
 const router = express.Router();
 export default router;
@@ -13,18 +12,16 @@ router.get(
   '/:id',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
-    try {
-      const getComments = await Expense.findById(req.params.id, {
-        messages: 1,
-      });
-
-      res.json({
-        comments: getComments.messages,
-      });
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).send('Server error');
-    }
+    const myData = { action: 'getComments', expenseID: req.params.id };
+    make_request('groups', myData, (err, results) => {
+      if (err) {
+        res.status(500).json({
+          errors: [{ msg: err }],
+        });
+      } else {
+        res.status(200).json({ comments: results.message });
+      }
+    });
   }
 );
 
@@ -36,20 +33,21 @@ router.post(
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
     const { expenseID, message } = req.body;
-    try {
-      const getComments = await Expense.findByIdAndUpdate(
-        expenseID,
-        { $push: { messages: { from: req.user.userName, message } } },
-        { select: ['messages'], new: true }
-      );
-
-      res.json({
-        comments: getComments.messages,
-      });
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).send('Server error');
-    }
+    const myData = {
+      action: 'postComments',
+      expenseID,
+      fromName: req.user.userName,
+      comment: message,
+    };
+    make_request('groups', myData, (err, results) => {
+      if (err) {
+        res.status(500).json({
+          errors: [{ msg: err }],
+        });
+      } else {
+        res.status(200).json({ comments: results.message });
+      }
+    });
   }
 );
 
@@ -61,19 +59,15 @@ router.delete(
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
     const { expenseID, commentID } = req.body;
-    try {
-      const getComments = await Expense.findByIdAndUpdate(
-        expenseID,
-        { $pull: { messages: { _id: commentID } } },
-        { select: ['messages'], new: true }
-      );
-
-      res.json({
-        comments: getComments.messages,
-      });
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).send('Server error');
-    }
+    const myData = { action: 'deleteComments', expenseID, commentID };
+    make_request('groups', myData, (err, results) => {
+      if (err) {
+        res.status(500).json({
+          errors: [{ msg: err }],
+        });
+      } else {
+        res.status(200).json({ comments: results.message });
+      }
+    });
   }
 );

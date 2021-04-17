@@ -1,12 +1,7 @@
 import express from 'express';
 import validator from 'express-validator';
 import passport from 'passport';
-import getSymbolFromCurrency from 'currency-symbol-map';
-import Group from '../../../models/Group.js';
-import Expense from '../../../models/Expense.js';
-import User from '../../../models/User.js';
-import Activity from '../../../models/Activity.js';
-import GroupMembers from '../../../models/GroupMembers.js';
+import make_request from '../../../kafka/client.js';
 
 const { check, validationResult } = validator;
 
@@ -20,21 +15,16 @@ router.get(
   '/:id',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
-    try {
-      const groupExpense = await Group.findById(req.params.id, {
-        expenses: 1,
-      }).populate({
-        path: 'expenses',
-        select: ['paidByName', 'paidByEmail', 'description', 'amount', 'date'],
-      });
-
-      res.json({
-        groupExpense,
-      });
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).send('Server error');
-    }
+    const myData = { action: 'getExpenseList', groupID: req.params.id };
+    make_request('groups', myData, (err, results) => {
+      if (err) {
+        res.status(500).json({
+          errors: [{ msg: err }],
+        });
+      } else {
+        res.status(200).json({ groupExpense: results.message });
+      }
+    });
   }
 );
 
@@ -45,30 +35,22 @@ router.get(
   '/group-balance/:id',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
-    try {
-      const members = await GroupMembers.find(
-        { groupID: req.params.id },
-        { _id: 0 }
-      ).populate({
-        path: 'memberID',
-        select: ['userName', 'userEmail', 'userPicture'],
-      });
-
-      res.json({
-        members,
-      });
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).send('Server error');
-    }
+    const myData = { action: 'getGroupBalance', groupID: req.params.id };
+    make_request('groups', myData, (err, results) => {
+      if (err) {
+        res.status(500).json({
+          errors: [{ msg: err }],
+        });
+      } else {
+        res.status(200).json({ members: results.message });
+      }
+    });
   }
 );
 
 // @route POST api/groups/
 // @desc Add expense
 // @access Private
-
-const roundToTwo = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
 
 router.post(
   '/',
@@ -88,94 +70,26 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    try {
-      const expense = new Expense({
-        description,
-        amount,
-        paidByEmail,
-        paidByName,
-        date,
-      });
-      expense.save();
-
-      const getGroupMembers = await GroupMembers.find({ groupID });
-
-      const membersExceptMe = getGroupMembers.filter(
-        (mem) => String(mem.memberID) !== String(req.user.id)
-      );
-
-      const mybal = roundToTwo(
-        amount - roundToTwo(amount / getGroupMembers.length)
-      );
-      const othersBal = roundToTwo(amount / getGroupMembers.length);
-
-      const groupMemberIdsExceptMe = membersExceptMe.map((mem) => mem._id);
-
-      // Update give balance
-      await GroupMembers.updateMany(
-        { _id: { $in: groupMemberIdsExceptMe } },
-        {
-          $inc: { give: othersBal },
-        }
-      );
-
-      //Update Getback
-      await GroupMembers.findOneAndUpdate(
-        { groupID, memberID: req.user.id },
-        {
-          $inc: { getBack: mybal },
-        }
-      );
-
-      const membersExceptMeIds = membersExceptMe.map((mem) => mem.memberID);
-
-      // Update owed to me for current user
-      membersExceptMe.map(async (mem) => {
-        await User.findByIdAndUpdate(req.user.id, {
-          $addToSet: {
-            owedToMe: {
-              memberID: mem.memberID,
-              amount: roundToTwo(amount / getGroupMembers.length),
-              groupID,
-            },
-          },
+    const myData = {
+      action: 'addExpense',
+      groupID,
+      description,
+      amount,
+      date,
+      paidByEmail,
+      paidByName,
+      userID: req.user.id,
+      userName: req.user.userName,
+      userCurrenct: req.user.userCurrency,
+    };
+    make_request('groups', myData, (err, results) => {
+      if (err) {
+        res.status(500).json({
+          errors: [{ msg: err }],
         });
-      });
-
-      // Update IOwe for other members
-      await User.updateMany(
-        { _id: { $in: membersExceptMeIds } },
-        {
-          $addToSet: {
-            iOwe: {
-              memberID: req.user.id,
-              amount: roundToTwo(amount / getGroupMembers.length),
-              groupID,
-            },
-          },
-        }
-      );
-
-      await Group.findByIdAndUpdate(groupID, {
-        $push: {
-          expenses: expense._id,
-        },
-      });
-
-      const groupInfo = await Group.findById(groupID, {
-        groupName: 1,
-        _id: 0,
-      });
-      const activity = new Activity({ groupID, actionBy: req.user.id });
-      activity.action = `${req.user.userName} added ${getSymbolFromCurrency(
-        req.user.userCurrency
-      )}${amount} to "${groupInfo.groupName}" group`;
-      activity.save();
-
-      res.send('Expense Added');
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Server error');
-    }
+      } else {
+        res.status(200).json(results.message);
+      }
+    });
   }
 );

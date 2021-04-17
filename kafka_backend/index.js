@@ -3,6 +3,7 @@ import conn from './kafka/connection.js';
 import handle_activity from './services/groups/activity.js';
 import handle_user from './services/users/profile.js';
 import handle_comment from './services/groups/expense-comment.js';
+import handle_groups from './services/groups/groups.js';
 
 // connect databse
 connectDB();
@@ -42,3 +43,4 @@ console.log('kafka-backend is running... ');
 handleTopicRequest('groups', handle_activity);
 handleTopicRequest('users', handle_user);
 handleTopicRequest('groups', handle_comment);
+handleTopicRequest('groups', handle_groups);

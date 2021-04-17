@@ -5,6 +5,8 @@ import handle_user from './services/users/profile.js';
 import handle_comment from './services/groups/expense-comment.js';
 import handle_groups from './services/groups/groups.js';
 import handle_myGroups from './services/groups/my-groups.js';
+import handle_newGroup from './services/groups/new-group.js';
+import handle_settle from './services/groups/settleUp.js';
 
 // connect databse
 connectDB();
@@ -46,3 +48,5 @@ handleTopicRequest('users', handle_user);
 handleTopicRequest('groups', handle_comment);
 handleTopicRequest('groups', handle_groups);
 handleTopicRequest('groups', handle_myGroups);
+handleTopicRequest('groups', handle_newGroup);
+handleTopicRequest('groups', handle_settle);

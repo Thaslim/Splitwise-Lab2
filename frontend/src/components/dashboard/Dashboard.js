@@ -55,6 +55,10 @@ const Dashboard = ({
         groups.mygroupList.iOwe
       );
       setOweToGroupNames(memBalanceEachGroup);
+    } else {
+      setOweNames([]);
+      setOwe(0.0);
+      setOweToGroupNames([]);
     }
 
     if (user && groups && groups.mygroupList.owedToMe.length) {
@@ -80,6 +84,10 @@ const Dashboard = ({
         groups.mygroupList.owedToMe
       );
       setGetBackFromGroupNames(memBalanceEachGroup);
+    } else {
+      setgetBackNames([]);
+      setGetBack(0.0);
+      setGetBackFromGroupNames([]);
     }
     setTotalBalance(roundToTwo(getBack - owe));
   }, [

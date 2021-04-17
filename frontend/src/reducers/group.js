@@ -141,7 +141,6 @@ function groupReducer(state = initialState, action) {
       return {
         ...state,
         error: payload,
-        expenseAdded: false,
       };
     case SETTLE_EXPENSE:
       return {

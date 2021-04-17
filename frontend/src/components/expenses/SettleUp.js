@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+
 import {
   Dialog,
   DialogActions,
@@ -84,7 +85,7 @@ const SettleUp = ({
     settleExpense(settleWithID);
     setTimeout(() => {
       setSettleUp(false);
-    }, 1000);
+    }, 300);
   };
   const classes = useStyles();
   return (

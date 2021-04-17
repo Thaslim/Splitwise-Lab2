@@ -80,7 +80,7 @@ router.post(
       paidByName,
       userID: req.user.id,
       userName: req.user.userName,
-      userCurrenct: req.user.userCurrency,
+      userCurrency: req.user.userCurrency,
     };
     make_request('groups', myData, (err, results) => {
       if (err) {

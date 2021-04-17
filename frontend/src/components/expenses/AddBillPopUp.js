@@ -58,7 +58,7 @@ const AddBillPopUp = ({
     });
     setTimeout(() => {
       setBillPopUp(false);
-    }, 1000);
+    }, 300);
   };
   const classes = useStyles();
   return (

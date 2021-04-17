@@ -48,7 +48,6 @@ const getGroupBalance = async (myData, callback) => {
 
     res.status = 200;
     res.message = members;
-    console.log(members);
     return callback(null, res);
   } catch (error) {
     res.message = 'server Error';

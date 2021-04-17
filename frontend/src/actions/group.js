@@ -245,6 +245,7 @@ export const editGroupInfo = (groupData, history) => async (dispatch) => {
       payload: res.data,
     });
     dispatch(setAlert('GroupInfo updated', 'success'));
+    dispatch(getAcceptedGroups());
     dispatch(getRecentActivity());
     history.push('/dashboard');
   } catch (error) {

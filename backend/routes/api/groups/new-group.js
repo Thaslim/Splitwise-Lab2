@@ -74,6 +74,7 @@ router.post(
       groupName,
       invites,
       groupPicture,
+      userName: req.user.userName,
     };
     make_request('groups', myData, (err, results) => {
       if (err) {

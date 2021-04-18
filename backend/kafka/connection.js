@@ -1,5 +1,4 @@
 import kafka from 'kafka-node';
-import stime from '../config/currentTime.js';
 
 class ConnectionProvider {
   constructor() {

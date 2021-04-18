@@ -1,6 +1,5 @@
 import crypto from 'crypto';
 import conn from './connection.js';
-import stime from '../config/currentTime.js';
 
 const TIMEOUT = 3000; // time to wait for response in ms
 

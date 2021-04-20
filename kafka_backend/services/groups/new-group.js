@@ -47,14 +47,14 @@ const createNewGroup = async (myData, callback) => {
       groupPicture: myData.groupPicture,
     });
     const groupID = group.id;
-    group.save();
+    await group.save();
 
     const gm = new GroupMembers({ groupID, memberID: myData.userID });
-    gm.save();
+    await gm.save();
 
     const activity = new Activity({ actionBy: myData.userID, groupID });
     activity.action = `${myData.userName} created "${myData.groupName}" group`;
-    activity.save();
+    await activity.save();
 
     let ids = [];
     if (myData.invites) {

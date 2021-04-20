@@ -36,14 +36,14 @@ const acceptInvitations = async (myData, callback) => {
         groupID: myData.groupID,
         memberID: myData.userID,
       });
-      member.save();
+      await member.save();
 
       const activity = new Activity({
         actionBy: myData.userID,
         groupID: myData.groupID,
       });
       activity.action = `${createdBy.createdBy.userName} added ${myData.userName} to the group "${myData.groupName}"`;
-      activity.save();
+      await activity.save();
 
       await User.findByIdAndUpdate(myData.userID, {
         $addToSet: { groups: myData.groupID },
@@ -92,7 +92,7 @@ const leaveGroup = async (myData, callback) => {
       action: `${myData.userName} left from the group ${myData.groupName}`,
       groupID: myData.groupID,
     });
-    activity.save();
+    await activity.save();
     res.status = 200;
     res.message = 'left from group';
     return callback(null, res);
@@ -194,7 +194,7 @@ const updateGroup = async (myData, callback) => {
         action: `${myData.userName} updated cover photo for "${myData.groupName}"`,
         groupID: myData.groupID,
       });
-      activity.save();
+      await activity.save();
     }
     res.status = 200;
     res.message = 'Updated';

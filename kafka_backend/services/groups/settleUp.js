@@ -87,7 +87,7 @@ const settleup = async (myData, callback) => {
         )}${ele.amount} in group "${groupName.groupName}"`,
         groupID: ele.groupID,
       });
-      activity.save();
+      await activity.save();
     });
 
     groupMembersBalance2.map(async (ele) => {
@@ -112,7 +112,7 @@ const settleup = async (myData, callback) => {
         )}${ele.amount} in group "${groupName.groupName}"`,
         groupID: ele.groupID,
       });
-      activity.save();
+      await activity.save();
     });
     res.status = 200;
     res.message = 'Settled';

@@ -66,7 +66,7 @@ const addExpense = async (myData, callback) => {
       paidByName: myData.paidByName,
       date: myData.date,
     });
-    expense.save();
+    await expense.save();
 
     const getGroupMembers = await GroupMembers.find({
       groupID: myData.groupID,
@@ -145,7 +145,7 @@ const addExpense = async (myData, callback) => {
     activity.action = `${myData.userName} added ${getSymbolFromCurrency(
       myData.userCurrency
     )}${myData.amount} to "${groupInfo.groupName}" group`;
-    activity.save();
+    await activity.save();
 
     res.status = 200;
     res.message = 'Expense Added';

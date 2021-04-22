@@ -23,7 +23,6 @@ function handleTopicRequest(topic_name, fname) {
       if (err) {
         errMsg = err.message;
       }
-      console.log('line 17...', err, res);
       const payloads = [
         {
           topic: data.replyTo,

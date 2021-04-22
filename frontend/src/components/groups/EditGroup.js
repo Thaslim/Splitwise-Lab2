@@ -27,7 +27,7 @@ const EditGroup = ({
 
       if (groupDetails[0].groupPicture) {
         setFilePath(
-          `http://localhost:3000/api/images/${groupDetails[0].groupPicture}`
+          `http://localhost:8000/api/images/${groupDetails[0].groupPicture}`
         );
       }
     }
@@ -105,7 +105,7 @@ const EditGroup = ({
                           <img
                             src={
                               (mem.memberID.userPicture &&
-                                `http://localhost:3000/api/images/${mem.memberID.userPicture}`) ||
+                                `http://localhost:8000/api/images/${mem.memberID.userPicture}`) ||
                               profilePic
                             }
                             alt='profilePic'

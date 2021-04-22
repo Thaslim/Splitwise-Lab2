@@ -7,7 +7,6 @@ export default function make_request(queue_name, msg_payload, callback) {
     if (err) {
       callback(err, null);
     } else {
-      console.log('response', response);
       callback(null, response);
     }
   });

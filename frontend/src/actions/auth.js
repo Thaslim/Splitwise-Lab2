@@ -23,7 +23,7 @@ export const loadUser = () => async (dispatch) => {
     setToken(localStorage.token);
   }
   try {
-    const res = await axios.get('api/login');
+    const res = await axios.get('http://localhost:8000/api/login');
 
     dispatch({
       type: USER_LOADED,

@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { NavLink, useHistory } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import getSymbolFromCurrency from 'currency-symbol-map';
-import AddBillPopUp from '../expenses/AddBillPopUp';
-import { getGroupActivity, getGroupBalances } from '../../actions/group';
+import AddBillPopUp from '../bill/AddBillPopUp';
+import {
+  getAcceptedGroups,
+  getGroupActivity,
+  getGroupBalances,
+} from '../../actions/group';
 import moment from 'moment';
 import { findbyID, sortArray } from '../../utils/findUtil';
 import { getMonthDate } from '../../utils/findUtil';
@@ -12,12 +16,11 @@ import Spinner from '../landingPage/Spinner';
 import profilePic from '../user/profile-pic.png';
 import ListExpenses from './ListExpenses';
 import { roundToTwo } from '../../utils/calc';
-
 import GroupBalanceList from './GroupBalanceList';
 
 const Groups = ({
   group: { groupActivity, groups, groupBalance },
-
+  getAcceptedGroups,
   match,
   user,
   getGroupActivity,
@@ -29,10 +32,9 @@ const Groups = ({
   const [groupName, setGroupName] = useState('');
   const [groupImg, setGroupImg] = useState('');
 
-  const history = useHistory();
   useEffect(() => {
-    if (!groups) history.push('/dashboard');
     if (user) {
+      if (!groups) getAcceptedGroups();
       setCSymbol(getSymbolFromCurrency(user.userCurrency));
       getGroupActivity(match.params.id);
       getGroupBalances(match.params.id);
@@ -42,7 +44,7 @@ const Groups = ({
       const groupInfo = findbyID(groups.mygroupList.groups, match.params.id);
       setGroupImg(
         groupInfo[0].groupPicture
-          ? `http://localhost:3000/api/images/${groupInfo[0].groupPicture}`
+          ? `http://localhost:8000/api/images/${groupInfo[0].groupPicture}`
           : profilePic
       );
       setGroupName(groupInfo[0].groupName);
@@ -54,7 +56,7 @@ const Groups = ({
     groups,
     isAuthenticated,
     user,
-    history,
+    getAcceptedGroups,
   ]);
   return groupActivity === null || groupBalance === null ? (
     <Spinner />
@@ -237,6 +239,7 @@ Groups.propTypes = {
   getGroupActivity: PropTypes.func.isRequired,
   getGroupBalances: PropTypes.func.isRequired,
   group: PropTypes.object.isRequired,
+  getAcceptedGroups: PropTypes.func.isRequired,
 };
 
 Groups.defaultProps = {
@@ -251,4 +254,5 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps, {
   getGroupActivity,
   getGroupBalances,
+  getAcceptedGroups,
 })(Groups);

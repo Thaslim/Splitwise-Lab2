@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
-import { useHistory } from 'react-router-dom';
 import ListActivity from './ListActivity';
 import { sortArray } from '../../utils/findUtil';
-import { getRecentActivity } from '../../actions/group';
+import { getAcceptedGroups, getRecentActivity } from '../../actions/group';
 import Spinner from '../landingPage/Spinner';
-import Pagination from '../../components/dashboard/Pagination';
+import Pagination from './Pagination';
 import { InputLabel, MenuItem, Select, FormControl } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -25,8 +24,9 @@ const useStyles = makeStyles((theme) => ({
 const RecentActivity = ({
   group: { recentactivity, groups, loading, activity_loading },
   getRecentActivity,
+  user,
+  getAcceptedGroups,
 }) => {
-  const history = useHistory();
   const [currentPage, setCurrentPage] = useState(1);
   const [activityPerPage, setActivityPerPage] = useState(2);
   const [selectGroup, setSelectGroup] = useState('');
@@ -35,8 +35,11 @@ const RecentActivity = ({
   const [mygroups, setMyGroups] = useState([]);
   const classes = useStyles();
   useEffect(() => {
-    if (!groups) history.push('/dashboard');
-    if (!recentactivity) getRecentActivity();
+    if (user) {
+      if (!groups) getAcceptedGroups();
+      if (!recentactivity) getRecentActivity();
+    }
+
     if (groups) setMyGroups(groups.mygroupList.groups);
 
     if (!activity_loading && !selectGroup && recentactivity) {
@@ -50,12 +53,13 @@ const RecentActivity = ({
     }
   }, [
     getRecentActivity,
-    history,
     groups,
     activity_loading,
     selectGroup,
     recentactivity,
     myactivity,
+    getAcceptedGroups,
+    user,
   ]);
 
   // Get Current Activity
@@ -170,12 +174,15 @@ const RecentActivity = ({
 RecentActivity.propTypes = {
   getRecentActivity: PropTypes.func.isRequired,
   group: PropTypes.object.isRequired,
+  getAcceptedGroups: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   group: state.group,
+  user: state.auth.user,
   isAuthenticated: state.auth.isAuthenticated,
 });
 export default connect(mapStateToProps, {
   getRecentActivity,
+  getAcceptedGroups,
 })(RecentActivity);

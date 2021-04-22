@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { NavLink, useHistory } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import SearchBar from 'material-ui-search-bar';
-import { acceptGroupInvitation, leaveGroup } from '../../actions/group';
+import {
+  acceptGroupInvitation,
+  getAcceptedGroups,
+  leaveGroup,
+} from '../../actions/group';
 import { findbyName } from '../../utils/findUtil';
 import profilePic from '../user/profile-pic.png';
 
@@ -11,6 +15,7 @@ const MyGroups = ({
   user,
   leaveGroup,
   isAuthenticated,
+  getAcceptedGroups,
   acceptGroupInvitation,
   group: { groups },
 }) => {
@@ -18,14 +23,17 @@ const MyGroups = ({
   const [invites, setInvites] = useState([]);
   const [searchGroup, setSearchGroup] = useState('');
   const [showGroupInfo, setShowGroupInfo] = useState([]);
-  const history = useHistory();
+
   useEffect(() => {
-    if (!groups) history.push('/dashboard');
+    if (user) {
+      if (!groups) getAcceptedGroups();
+    }
+
     if (groups) {
       setAccList(groups.mygroupList.groups);
       setInvites(groups.mygroupList.invites);
     }
-  }, [groups, history, isAuthenticated, user]);
+  }, [getAcceptedGroups, groups, isAuthenticated, user]);
 
   const showGroup = (value) => {
     const found = findbyName(accList, value);
@@ -51,7 +59,7 @@ const MyGroups = ({
                       className='userImage'
                       src={
                         (el.groupPicture &&
-                          `http://localhost:3000/api/images/${el.groupPicture}`) ||
+                          `http://localhost:8000/api/images/${el.groupPicture}`) ||
                         profilePic
                       }
                       alt='groupPic'
@@ -102,7 +110,7 @@ const MyGroups = ({
                         className='userImage'
                         src={
                           (el.groupPicture &&
-                            `http://localhost:3000/api/images/${el.groupPicture}`) ||
+                            `http://localhost:8000/api/images/${el.groupPicture}`) ||
                           profilePic
                         }
                         alt='groupPic'
@@ -135,6 +143,7 @@ MyGroups.propTypes = {
   acceptGroupInvitation: PropTypes.func.isRequired,
   leaveGroup: PropTypes.func.isRequired,
   group: PropTypes.object.isRequired,
+  getAcceptedGroups: PropTypes.func.isRequired,
 };
 
 MyGroups.defaultProps = {
@@ -148,5 +157,6 @@ const mapStateToProps = (state) => ({
 });
 export default connect(mapStateToProps, {
   acceptGroupInvitation,
+  getAcceptedGroups,
   leaveGroup,
 })(MyGroups);

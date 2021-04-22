@@ -38,6 +38,7 @@ router.post(
       expenseID,
       fromName: req.user.userName,
       comment: message,
+      userID: req.user.id,
     };
     make_request('groups', myData, (err, results) => {
       if (err) {

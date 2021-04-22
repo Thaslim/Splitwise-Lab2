@@ -19,7 +19,7 @@ const Navbar = ({ user, isAuthenticated, loading, logout }) => {
         setNameFormat(capitalize(user.userName));
       }
       if (user.userPicture) {
-        setFp(`api/images/${user.userPicture}`);
+        setFp(`http://localhost:8000/api/images/${user.userPicture}`);
       } else {
         setFp(profilePic);
       }

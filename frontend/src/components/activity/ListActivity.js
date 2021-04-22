@@ -29,15 +29,28 @@ const ListActivity = ({ description, date }) => {
             {dt.getDate()}
           </div>
         </div>
-        <i
-          className='fas fa-receipt'
-          style={{
-            fontSize: '25px',
-            color: '#555555',
-            marginTop: '2.5%',
-            opacity: '0.6',
-          }}
-        />
+        {description.includes('commented on') && (
+          <i
+            className='fas fa-comments-dollar'
+            style={{
+              fontSize: '25px',
+              color: '#555555',
+              marginTop: '2.5%',
+              opacity: '0.6',
+            }}
+          ></i>
+        )}
+        {!description.includes('commented on') && (
+          <i
+            className='fas fa-receipt'
+            style={{
+              fontSize: '25px',
+              color: '#555555',
+              marginTop: '2.5%',
+              opacity: '0.6',
+            }}
+          />
+        )}
         &nbsp; {description}
       </div>
     </div>

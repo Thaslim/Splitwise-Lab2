@@ -4,7 +4,7 @@ import profilePic from '../user/profile-pic.png';
 
 const GroupBalanceList = ({ cls, memName, amount, csymbol, imgSrc, txt }) => {
   const src = imgSrc.userPicture
-    ? `http://localhost:3000/api/images/${imgSrc.userPicture}`
+    ? `http://localhost:8000/api/images/${imgSrc.userPicture}`
     : profilePic;
 
   return (

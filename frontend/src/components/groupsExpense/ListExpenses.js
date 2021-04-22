@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import receipt from './receipt.png';
-import {
-  postComments,
-  getComments,
-  deleteComment,
-} from '../../actions/comment';
+import { postComments, getComments } from '../../actions/comment';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import { getMonthDate } from '../../utils/findUtil';
+import DeleteCommentPopUp from './deleteCommentPopUp';
 
 const ListExpenses = ({
   description,
@@ -24,12 +21,13 @@ const ListExpenses = ({
   year,
   postComments,
   getComments,
-  deleteComment,
   user,
   comment: { comments, loading },
 }) => {
   const [message, setMessage] = useState('');
   const [notes, setNotes] = useState([]);
+  const [deleteCommentPopUp, setdeleteCommentPopUp] = useState(false);
+  const [delCommentID, setDelCommentID] = useState();
 
   const handlePost = async (e, id, message) => {
     e.preventDefault();
@@ -38,7 +36,8 @@ const ListExpenses = ({
   };
 
   const delComment = (commentID) => {
-    deleteComment({ expenseID: id, commentID });
+    setdeleteCommentPopUp(true);
+    setDelCommentID(commentID);
   };
   const handleClick = (id) => {
     const x = document.querySelector(`[data-listid="${id}"]`);
@@ -56,6 +55,16 @@ const ListExpenses = ({
   }, [comments]);
   return (
     <div data-testid='listexpense' className='list-group-item'>
+      {deleteCommentPopUp && (
+        <>
+          <DeleteCommentPopUp
+            deleteCommentPopUp={deleteCommentPopUp}
+            setdeleteCommentPopUp={setdeleteCommentPopUp}
+            commentID={delCommentID}
+            id={id}
+          />
+        </>
+      )}
       <div className='main-block'>
         <div
           className='date'
@@ -245,7 +254,6 @@ const ListExpenses = ({
 ListExpenses.propTypes = {
   postComments: PropTypes.func.isRequired,
   getComments: PropTypes.func.isRequired,
-  deleteComment: PropTypes.func.isRequired,
   comment: PropTypes.object.isRequired,
   user: PropTypes.object.isRequired,
 };
@@ -258,5 +266,4 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps, {
   postComments,
   getComments,
-  deleteComment,
 })(ListExpenses);

@@ -1,4 +1,6 @@
 import Expense from '../../models/Expense.js';
+import Group from '../../models/Group.js';
+import Activity from '../../models/Activity.js';
 
 const res = {};
 
@@ -45,6 +47,20 @@ const postComments = async (myData, callback) => {
       },
       { select: ['messages'], new: true }
     );
+    const group = await Group.findOne(
+      { expenses: myData.expenseID },
+      { _id: 1 }
+    );
+    const expenseName = await Expense.findById(myData.expenseID, {
+      description: 1,
+    });
+
+    const activity = new Activity({
+      actionBy: myData.userID,
+      groupID: group._id,
+    });
+    activity.action = `${myData.fromName} commented on "${expenseName.description}": ${myData.comment}`;
+    await activity.save();
 
     res.status = 200;
     res.message = getComments.messages;

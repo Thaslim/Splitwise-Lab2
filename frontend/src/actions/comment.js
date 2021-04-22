@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getRecentActivity } from './group.js';
 
 import {
   GET_COMMENTS,
@@ -47,6 +48,7 @@ export const postComments = ({ expenseID, message }) => async (dispatch) => {
       type: POST_COMMENT,
       payload: res.data,
     });
+    dispatch(getRecentActivity());
   } catch (error) {
     dispatch({
       type: POST_COMMENT_ERROR,

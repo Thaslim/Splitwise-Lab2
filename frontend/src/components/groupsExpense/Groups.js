@@ -44,7 +44,7 @@ const Groups = ({
       const groupInfo = findbyID(groups.mygroupList.groups, match.params.id);
       setGroupImg(
         groupInfo[0].groupPicture
-          ? `http://localhost:8000/api/images/${groupInfo[0].groupPicture}`
+          ? `http://3.135.185.14:8000/api/images/${groupInfo[0].groupPicture}`
           : profilePic
       );
       setGroupName(groupInfo[0].groupName);

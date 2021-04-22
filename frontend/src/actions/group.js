@@ -28,7 +28,7 @@ import {
 // Get Recent Activity
 export const getRecentActivity = () => async (dispatch) => {
   try {
-    const res = await axios.get('http://localhost:8000/api/activity');
+    const res = await axios.get('http://3.135.185.14:8000/api/activity');
     dispatch({
       type: GET_RECENT_ACTIVITY,
       payload: res.data,
@@ -70,7 +70,7 @@ export const getAllUsers = () => async (dispatch) => {
 // Get users active groups list
 export const getAcceptedGroups = () => async (dispatch) => {
   try {
-    const res = await axios.get('http://localhost:8000/api/my-groups/');
+    const res = await axios.get('http://3.135.185.14:8000/api/my-groups/');
     dispatch({
       type: GET_GROUPS,
       payload: res.data,
@@ -96,7 +96,7 @@ export const addExpense = ({ groupID, description, amount, date }) => async (
     };
     const body = JSON.stringify({ groupID, description, amount, date });
     const res = await axios.post(
-      'http://localhost:8000/api/groups/',
+      'http://3.135.185.14:8000/api/groups/',
       body,
       config
     );

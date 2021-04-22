@@ -14,7 +14,7 @@ import {
 export const getComments = (expenseID) => async (dispatch) => {
   try {
     const res = await axios.get(
-      `http://localhost:8000/api/expense/${expenseID}`
+      `http://3.135.185.14:8000/api/expense/${expenseID}`
     );
     dispatch({
       type: GET_COMMENTS,
@@ -40,7 +40,7 @@ export const postComments = ({ expenseID, message }) => async (dispatch) => {
     const body = JSON.stringify({ expenseID, message });
 
     const res = await axios.post(
-      'http://localhost:8000/api/expense',
+      'http://3.135.185.14:8000/api/expense',
       body,
       config
     );
@@ -64,7 +64,7 @@ export const postComments = ({ expenseID, message }) => async (dispatch) => {
 export const deleteComment = ({ expenseID, commentID }) => async (dispatch) => {
   try {
     const data = JSON.stringify({ expenseID, commentID });
-    const res = await axios.delete('http://localhost:8000/api/expense', {
+    const res = await axios.delete('http://3.135.185.14:8000/api/expense', {
       data,
       headers: { 'Content-type': 'application/json' },
     });

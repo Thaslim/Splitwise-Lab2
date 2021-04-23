@@ -7,7 +7,7 @@ Using this project
 Clone the project, cd into the directory and install the dependencies
 
 ```
-git clone https://github.com/Thaslim/Splitwise-lab1.git
+git clone https://github.com/Thaslim/Splitwise-Lab2.git
 cd frontend
 npm install
 cd backend

@@ -40,6 +40,10 @@ const MyGroups = ({
     if (found) setShowGroupInfo(found);
   };
 
+  const handleClick = (id, groupName) => {
+    leaveGroup(id, groupName);
+    setShowGroupInfo([]);
+  };
   return (
     <div className='mygroups'>
       <div>
@@ -59,7 +63,7 @@ const MyGroups = ({
                       className='userImage'
                       src={
                         (el.groupPicture &&
-                          `http://localhost:8000/api/images/${el.groupPicture}`) ||
+                          `http://3.135.185.14:8000/api/images/${el.groupPicture}`) ||
                         profilePic
                       }
                       alt='groupPic'
@@ -110,7 +114,7 @@ const MyGroups = ({
                         className='userImage'
                         src={
                           (el.groupPicture &&
-                            `http://localhost:8000/api/images/${el.groupPicture}`) ||
+                            `http://3.135.185.14:8000/api/images/${el.groupPicture}`) ||
                           profilePic
                         }
                         alt='groupPic'
@@ -122,7 +126,7 @@ const MyGroups = ({
                     <button
                       type='submit'
                       className='btm btn-outline-danger btn-md rounded'
-                      onClick={() => leaveGroup(`${el._id}`, `${el.groupName}`)}
+                      onClick={() => handleClick(el._id, el.groupName)}
                     >
                       Leave Group
                     </button>

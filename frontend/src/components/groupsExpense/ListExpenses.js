@@ -22,7 +22,7 @@ const ListExpenses = ({
   postComments,
   getComments,
   user,
-  comment: { comments, loading },
+  comment: { comments },
 }) => {
   const [message, setMessage] = useState('');
   const [notes, setNotes] = useState([]);

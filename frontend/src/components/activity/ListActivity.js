@@ -5,7 +5,7 @@ import { getMonthDate } from '../../utils/findUtil';
 const ListActivity = ({ description, date }) => {
   const dt = new Date(date);
   return (
-    <div className='list-group-item'>
+    <div className='list-group-item' data-testid='listActivity'>
       <div>
         <div
           className='date'

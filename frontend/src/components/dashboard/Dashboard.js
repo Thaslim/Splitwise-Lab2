@@ -3,14 +3,14 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import getSymbolFromCurrency from 'currency-symbol-map';
-import AddBillPopUp from '../expenses/AddBillPopUp';
+import AddBillPopUp from '../bill/AddBillPopUp';
 import { getAcceptedGroups } from '../../actions/group';
 import { roundToTwo } from '../../utils/calc';
 import ListBalance from './ListBalance';
 import Spinner from '../landingPage/Spinner';
 import profilePic from '../user/profile-pic.png';
 import getIndividualGroupBalance from '../../utils/getGroupBalance.js';
-import SettleUp from '../expenses/SettleUp';
+import SettleUp from '../bill/SettleUp';
 
 const Dashboard = ({
   group: { groupInfo, groups, loading },
